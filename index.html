@@ -212,29 +212,33 @@ function irAdmin(){ ST.view='admin'; R(); }
 function buildLanding(){
   var esAdmin=new URLSearchParams(window.location.search).get('admin')==='1';
   var logo=ST.images&&ST.images.logo
-    ?'<img src="'+ST.images.logo+'" style="max-width:220px;max-height:90px;object-fit:contain;border-radius:12px;margin-bottom:20px">'
-    :'<div style="font-size:64px;margin-bottom:8px">📸</div><h1 style="font-size:32px;font-weight:900;color:#fff;margin-bottom:4px;font-style:italic">Studio <span style="color:#818cf8">Zeta</span></h1><p style="color:#64748b;font-size:11px;letter-spacing:4px;text-transform:uppercase;margin-bottom:20px">Plataforma de Gestion de Fotos Escolares</p>';
+    ?'<img src="'+ST.images.logo+'" style="max-width:220px;max-height:90px;object-fit:contain;border-radius:12px;margin-bottom:16px">'
+    :'<div style="font-size:56px;margin-bottom:6px">📸</div>';
   var html='<div style="min-height:100vh;background:linear-gradient(160deg,#0f172a 0%,#1e1b4b 60%,#0f172a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center">';
   html+='<div style="max-width:420px;width:100%">';
   html+=logo;
-  html+='<div style="background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(124,58,237,.15));border:1px solid rgba(99,102,241,.3);border-radius:20px;padding:28px 24px;margin-bottom:20px">';
-  html+='<div style="font-size:26px;font-weight:900;color:#fff;margin-bottom:8px">¡Pedí tus fotos acá!</div>';
-  html+='<p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-bottom:20px">Elegí tu colegio, buscá al alumno y comprá tu pack de fotos en minutos. <strong style="color:#a5b4fc">Facil, rapido y seguro.</strong></p>';
-  html+='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;text-align:left">';
-  html+='<div style="display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:13px"><span style="font-size:18px">✅</span> Elegis el pack que queres</div>';
-  html+='<div style="display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:13px"><span style="font-size:18px">💳</span> Pagas con Mercado Pago</div>';
-  html+='<div style="display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:13px"><span style="font-size:18px">🎉</span> MP te entrega el comprobante</div>';
+  if(!ST.images||!ST.images.logo){
+    html+='<div style="font-size:22px;font-weight:900;color:#fff;margin-bottom:2px;font-style:italic">Studio <span style="color:#818cf8">Zeta</span></div>';
+  }
+  html+='<div style="font-size:11px;color:#64748b;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px">Tus fotos escolares, en un clic</div>';
+  html+='<div style="background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(124,58,237,.15));border:1px solid rgba(99,102,241,.3);border-radius:20px;padding:24px;margin-bottom:16px">';
+  html+='<div style="font-size:24px;font-weight:900;color:#fff;margin-bottom:10px">¡Pedí tus fotos acá!</div>';
+  html+='<p style="color:#94a3b8;font-size:13px;line-height:1.7;margin-bottom:20px">Buscá al alumno, elegí tu pack, sumá copias extras si querés y pagá con <strong style="color:#a5b4fc">Mercado Pago</strong>.</p>';
+  html+='<div style="display:flex;flex-direction:column;gap:7px;margin-bottom:20px;text-align:left">';
+  html+='<div style="display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:13px"><span>1️⃣</span> Buscá al alumno por colegio y grado</div>';
+  html+='<div style="display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:13px"><span>2️⃣</span> Elegí tu pack y agregá extras si querés</div>';
+  html+='<div style="display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:13px"><span>3️⃣</span> Pagá con Mercado Pago de forma segura</div>';
   html+='</div>';
-  html+='<p style="color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px">Selecciona tu colegio</p>';
+  html+='<div style="font-size:11px;color:#475569;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px">Seleccioná tu colegio</div>';
   ST.schools.forEach(function(sc,idx){
-    html+='<button onclick="irAColegio('+idx+')" style="width:100%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:14px;padding:18px 20px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 20px rgba(79,70,229,.4)">';
-    html+='<span>🏫 '+esc(sc.name)+'</span><span style="font-size:22px">→</span></button>';
+    html+='<button onclick="irAColegio('+idx+')" style="width:100%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:14px;padding:16px 20px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 20px rgba(79,70,229,.35)">';
+    html+='<span>🏫 '+esc(sc.name)+'</span><span style="font-size:20px">→</span></button>';
   });
   html+='</div>';
   if(esAdmin){
-    html+='<button onclick="irAdmin()" style="margin-top:8px;background:none;border:1px solid #1e293b;color:#334155;border-radius:10px;padding:8px 16px;font-size:11px;cursor:pointer">⚙️ Admin</button>';
+    html+='<button onclick="irAdmin()" style="margin-top:6px;background:none;border:1px solid #1e293b;color:#334155;border-radius:10px;padding:7px 14px;font-size:11px;cursor:pointer">⚙️ Admin</button>';
   }
-  html+='<p style="color:#1e293b;font-size:10px;margin-top:20px">Studio Zeta Fotografia & Video</p>';
+  html+='<div style="color:#1e293b;font-size:10px;margin-top:16px">Studio Zeta Fotografia & Video</div>';
   html+='</div></div>';
   return html;
 }
@@ -1061,6 +1065,11 @@ function buildConfig(){
   html+='<button class="btn btn-R btn-sm" onclick="limpiarDatos()">🗑️ Limpiar todo y empezar de cero</button>';
   html+='</div>';
 
+  html+='<div style="background:'+(ST.modoPrueba?'rgba(245,158,11,.1)':'#1e293b')+';border:2px solid '+(ST.modoPrueba?'#f59e0b':'#334155')+';border-radius:12px;padding:16px;margin-bottom:10px">';
+  html+='<div style="font-weight:700;color:#fbbf24;margin-bottom:6px;font-size:14px">🧪 Modo Prueba de Compras</div>';
+  html+='<p style="font-size:12px;color:#94a3b8;margin-bottom:10px">Activo: las compras se registran sin cobrar. Para probar planilla y .BAT.</p>';
+  html+='<button onclick="ST.modoPrueba=!ST.modoPrueba;saveData();R()" style="width:100%;padding:13px;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;background:'+(ST.modoPrueba?'#f59e0b':'#334155')+';color:'+(ST.modoPrueba?'#000':'#fff')+'">'+(ST.modoPrueba?'🟡 PRUEBA ACTIVA — Toco para desactivar':'⚪ Activar Modo Prueba')+'</button>';
+  html+='</div>';
   html+='<button class="btn btn-I btn-f" style="font-size:15px;padding:14px;margin-top:12px" onclick="saveConfig()">💾 Guardar Config</button>';
   return html;
 }
