@@ -801,66 +801,98 @@ function cerrarOvEfectivo(){
   var ov=document.getElementById('ov-efectivo');
   if(ov) ov.parentNode.removeChild(ov);
 }
+
 function addCashOrder(){
   var opts=[];
   ST.schools.forEach(function(sc){
     (sc.levels||[]).forEach(function(lv){
       (lv.grades||[]).forEach(function(gr){
         if((gr.students||[]).length>0){
-          opts.push({label:sc.name+' — '+gr.name, sc:sc.id, lv:lv.id, gr:gr.id, students:gr.students});
+          opts.push({label:sc.name+' — '+gr.name,sc:sc.id,lv:lv.id,gr:gr.id,scName:sc.name,lvName:lv.name,grName:gr.name,students:gr.students});
         }
       });
     });
   });
   if(!opts.length){alert('No hay grados con alumnos cargados.');return;}
   window._cashOpts=opts;
+
   var opHtml=opts.map(function(op,i){return '<option value="'+i+'">'+esc(op.label)+'</option>';}).join('');
   var div=document.createElement('div');
   div.id='ov-efectivo';
-  div.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
-  div.innerHTML='<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:24px;width:100%;max-width:360px">'
-    +'<div style="font-weight:900;color:#fff;font-size:16px;margin-bottom:16px">💵 Pago en Efectivo</div>'
+  div.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.8);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto';
+  div.innerHTML='<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:20px;width:100%;max-width:400px;margin-top:20px">'
+    +'<div style="font-weight:900;color:#fff;font-size:16px;margin-bottom:4px">💵 Pago en Efectivo</div>'
+    +'<p style="font-size:12px;color:#64748b;margin-bottom:14px">Para casos excepcionales fuera de Mercado Pago</p>'
     +'<label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Colegio / Grado</label>'
-    +'<select id="em_grado" style="width:100%;background:#0f172a;border:1.5px solid #334155;border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:10px;box-sizing:border-box"><option value="">-- Elegí --</option>'+opHtml+'</select>'
-    +'<label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Alumno</label>'
-    +'<select id="em_alumno" style="width:100%;background:#0f172a;border:1.5px solid #334155;border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:10px;box-sizing:border-box"><option value="">-- Elegí el grado primero --</option></select>'
-    +'<label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Celular (opcional)</label>'
-    +'<input id="em_phone" type="tel" style="width:100%;background:#0f172a;border:1.5px solid #334155;border-radius:8px;padding:10px;color:#fff;font-size:14px;margin-bottom:14px;box-sizing:border-box" placeholder="11 2345-6789">'
+    +'<select id="em_grado" style="width:100%;background:#0f172a;border:1.5px solid #334155;border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:12px;box-sizing:border-box"><option value="">-- Elegí --</option>'+opHtml+'</select>'
+    +'<div id="em_lista" style="max-height:300px;overflow-y:auto;margin-bottom:12px"></div>'
     +'<div style="display:flex;gap:8px">'
-    +'<button onclick="confirmarEfectivo()" style="flex:1;background:#059669;color:#fff;border:none;border-radius:9px;padding:12px;font-weight:700;cursor:pointer;font-size:14px">✅ Registrar</button>'
+    +'<button onclick="confirmarEfectivo()" style="flex:1;background:#059669;color:#fff;border:none;border-radius:9px;padding:12px;font-weight:700;cursor:pointer;font-size:14px">✅ Registrar seleccionados</button>'
     +'<button onclick="cerrarOvEfectivo()" style="flex:1;background:#334155;color:#fff;border:none;border-radius:9px;padding:12px;font-weight:700;cursor:pointer;font-size:14px">Cancelar</button>'
     +'</div></div>';
   document.body.appendChild(div);
+
   document.getElementById('em_grado').addEventListener('change',function(){
     var idx=parseInt(this.value);
-    var sel=document.getElementById('em_alumno');
-    sel.innerHTML='<option value="">-- Elegí --</option>';
-    if(!isNaN(idx)&&window._cashOpts[idx]){
-      window._cashOpts[idx].students.forEach(function(st,i){
-        sel.innerHTML+='<option value="'+i+'">'+esc(st.name)+'</option>';
-      });
-    }
+    var lista=document.getElementById('em_lista');
+    lista.innerHTML='';
+    if(isNaN(idx)||!window._cashOpts[idx]) return;
+    var op=window._cashOpts[idx];
+    var base=ST.products.find(function(p){return p.isBase;});
+    var extras=ST.products.filter(function(p){return !p.isBase;});
+    op.students.forEach(function(st,i){
+      var row=document.createElement('div');
+      row.style.cssText='background:#0f172a;border-radius:8px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap';
+      var extrasHtml=extras.map(function(ex,ei){
+        return '<div style="display:flex;align-items:center;gap:3px">'
+          +'<span style="font-size:10px;color:#64748b">+Ext:</span>'
+          +'<input type="number" min="0" max="20" value="0" data-ext="'+ei+'" data-st="'+i+'" style="width:36px;background:#1e293b;border:1px solid #334155;border-radius:4px;padding:3px;color:#fff;font-size:11px;text-align:center">'
+          +'</div>';
+      }).join('');
+      row.innerHTML='<input type="checkbox" data-st="'+i+'" style="width:16px;height:16px;cursor:pointer;accent-color:#6366f1">'
+        +'<span style="flex:1;font-size:13px;color:#fff;font-weight:600">'+esc(st.name)+'</span>'
+        +'<div style="display:flex;align-items:center;gap:4px">'
+        +'<span style="font-size:10px;color:#64748b">Carpetas:</span>'
+        +'<input type="number" min="1" max="20" value="1" data-qty="'+i+'" style="width:36px;background:#1e293b;border:1px solid #334155;border-radius:4px;padding:3px;color:#fff;font-size:12px;text-align:center">'
+        +'</div>'
+        +extrasHtml;
+      lista.appendChild(row);
+    });
   });
 }
+
 function confirmarEfectivo(){
   var gradoIdx=parseInt((document.getElementById('em_grado')||{}).value);
-  var alumnoIdx=parseInt((document.getElementById('em_alumno')||{}).value);
-  var phone=((document.getElementById('em_phone')||{}).value||'').trim();
-  if(isNaN(gradoIdx)||gradoIdx<0||!window._cashOpts[gradoIdx]){alert('Elegi un grado.');return;}
-  if(isNaN(alumnoIdx)||alumnoIdx<0){alert('Elegi un alumno.');return;}
+  if(isNaN(gradoIdx)||!window._cashOpts[gradoIdx]){alert('Elegi un grado.');return;}
   var op=window._cashOpts[gradoIdx];
   var sc=ST.schools.find(function(s){return s.id===op.sc;});
   var lv=sc&&(sc.levels||[]).find(function(l){return l.id===op.lv;});
   var gr=lv&&(lv.grades||[]).find(function(g){return g.id===op.gr;});
-  var st=gr&&gr.students[alumnoIdx];
-  if(!st){alert('Error al encontrar alumno.');return;}
+  if(!gr){alert('Error.');return;}
   var base=ST.products.find(function(p){return p.isBase;});
-  var o={id:uid(),studentId:st.id,studentName:st.name,schoolName:sc.name,levelName:lv.name,gradeName:gr.name,phone:phone,status:'paid',paymentMethod:'cash',total:base?base.price:0,items:base?[{name:base.name,qty:1,price:base.price}]:[],createdAt:Date.now()};
-  ST.orders.push(o);
+  var extras=ST.products.filter(function(p){return !p.isBase;});
+  var lista=document.getElementById('em_lista');
+  var checks=lista.querySelectorAll('input[type=checkbox]:checked');
+  if(!checks.length){alert('Marca al menos un alumno.');return;}
+  var registrados=0;
+  checks.forEach(function(chk){
+    var i=parseInt(chk.getAttribute('data-st'));
+    var st=gr.students[i]; if(!st) return;
+    var qty=parseInt((lista.querySelector('input[data-qty="'+i+'"]')||{}).value)||1;
+    var items=[];
+    if(base) items.push({name:base.name,qty:qty,price:base.price});
+    extras.forEach(function(ex,ei){
+      var extQty=parseInt((lista.querySelector('input[data-ext="'+ei+'"][data-st="'+i+'"]')||{}).value)||0;
+      if(extQty>0) items.push({name:ex.name,qty:extQty,price:ex.price});
+    });
+    var total=items.reduce(function(a,it){return a+it.price*it.qty;},0);
+    ST.orders.push({id:uid(),studentId:st.id,studentName:st.name,schoolName:op.scName,levelName:op.lvName,gradeName:op.grName,phone:'',status:'paid',paymentMethod:'cash',total:total,items:items,createdAt:Date.now()});
+    registrados++;
+  });
   saveData();
   cerrarOvEfectivo();
   R();
-  alert('Registrado: '+st.name+' — '+gr.name);
+  alert('Registrados '+registrados+' pagos en efectivo en '+op.grName+'.');
 }
 
 // ─── WHATSAPP ───
