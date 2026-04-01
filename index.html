@@ -214,6 +214,15 @@ function irAColegio(idx){
 function irAdmin(){ ST.view='admin'; R(); }
 function buildLanding(){
   var esAdmin=new URLSearchParams(window.location.search).get('admin')==='1';
+  // Si viene ?colegio=ID mostrar solo ese colegio
+  var colegioFiltro=new URLSearchParams(window.location.search).get('colegio');
+  var schoolsVisibles=ST.schools;
+  if(colegioFiltro){
+    schoolsVisibles=ST.schools.filter(function(sc){return sc.id===colegioFiltro;});
+    // Si no encontró por ID, mostrar todos
+    if(!schoolsVisibles.length) schoolsVisibles=ST.schools;
+  }
+
   var logo=ST.images&&ST.images.logo
     ?'<img src="'+ST.images.logo+'" style="max-width:220px;max-height:90px;object-fit:contain;border-radius:12px;margin-bottom:16px">'
     :'<div style="font-size:56px;margin-bottom:6px">📸</div>';
@@ -233,7 +242,9 @@ function buildLanding(){
   html+='<div style="display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:13px"><span>3️⃣</span> Pagá con Mercado Pago de forma segura</div>';
   html+='</div>';
   html+='<div style="font-size:11px;color:#475569;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px">Seleccioná tu colegio</div>';
-  ST.schools.forEach(function(sc,idx){
+  // Mostrar solo los colegios filtrados
+  schoolsVisibles.forEach(function(sc){
+    var idx=ST.schools.indexOf(sc);
     html+='<button onclick="irAColegio('+idx+')" style="width:100%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:14px;padding:16px 20px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 20px rgba(79,70,229,.35)">';
     html+='<span>🏫 '+esc(sc.name)+'</span><span style="font-size:20px">→</span></button>';
   });
@@ -1726,7 +1737,6 @@ function mostrarConfirmacion(el, nombre, total){
 function checkMP(){
   var p=new URLSearchParams(window.location.search);
 
-  // Retorno de Mercado Pago
   if(p.get('status')==='success'){
     var oid=p.get('order');
     var o=ST.orders.find(function(o){return o.id===oid;});
@@ -1735,19 +1745,24 @@ function checkMP(){
     ST.view='store'; ST.step=1; return;
   }
 
-  // ?admin=1 → panel admin (solo vos)
   if(p.get('admin')==='1'){
     ST.view='admin'; return;
   }
 
-  // ?colegio=ID → tienda filtrada
   if(p.get('colegio')){
-    var sc=ST.schools.find(function(s){return s.id===p.get('colegio');});
-    if(sc) ST.sel.school=sc.id;
-    ST.view='store'; ST.step=1; return;
+    var scId=p.get('colegio');
+    var sc=ST.schools.find(function(s){return s.id===scId;});
+    if(sc){
+      ST.sel.school=sc.id;
+      // Si hay un solo colegio en el link, ir directo a la tienda
+      ST.view='store'; ST.step=1;
+    } else {
+      ST.view='landing';
+    }
+    return;
   }
 
-  // Por defecto → landing (padres eligen colegio)
+  // Sin parámetros → landing
   ST.view='landing';
 }
 
