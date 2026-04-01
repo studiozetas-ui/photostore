@@ -125,7 +125,7 @@ function safeName(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u03
 
 // ─── PERSISTENCIA ───
 function loadData(){
-  var DATOS_EMBEBIDOS = {"schools": [{"id": "sc1", "name": "CIMDIP & MIGUEL CANE", "levels": [{"id": "lv1", "name": "Jardin", "grades": []}, {"id": "lv2", "name": "Primaria", "grades": [{"id": "gr1", "name": "1A", "students": [{"id": "u01ml5yrhl07", "name": "ANDRZEJKOWICZ, PEDRO FELIX"}, {"id": "ui4fo9n3hl07", "name": "BIELICA CASAZZA, GUADALUPE"}, {"id": "uaegce57hl07", "name": "BRAUN, BRUNO PAUL"}, {"id": "uy7028h9hl07", "name": "CHELOTTI, TOBIAS"}, {"id": "uwm4jlrmhl07", "name": "CHIAPPE, FRANCESCA OLIVIA"}, {"id": "u6adu20ohl07", "name": "CRISTALDO, ROMAN EZEQUIEL"}, {"id": "uiheqoyvhl07", "name": "DI BELLA ORTEGA, VICENTE"}, {"id": "u5au3dxnhl07", "name": "FIGUEROA, JULIA"}, {"id": "ud10awoohl07", "name": "FRATTASI, VALENTINA"}, {"id": "uqmcn52ihl07", "name": "GATTI, LUCIANA"}, {"id": "u4khhl0bhl07", "name": "GHERBESI, HELENA"}, {"id": "ufb3cjgshl08", "name": "GIULIANETTI BELTRAMINO, JULIA"}, {"id": "uj894j78hl08", "name": "HILLIER, FELICITAS"}, {"id": "urkkrk4mhl08", "name": "LALIN, FIDEL"}, {"id": "u5zr4wtahl08", "name": "LASKO, ESTEFANO SEBASTIAN"}, {"id": "ulkrad51hl08", "name": "LOTIERZO, FRANCESCA"}, {"id": "uu7aswmehl08", "name": "MACHELLO, LUCA"}, {"id": "upmz5ub1hl08", "name": "MONTENEGRO, MARCOS BAUTISTA"}, {"id": "uwxxrpgthl08", "name": "NECOL BARROS, JULIAN"}, {"id": "ujxaqfebhl08", "name": "NOGUERA, LEANDRO VALENTIN"}, {"id": "u1dg6dfmhl08", "name": "PALUMBO, VICTORIA"}, {"id": "ua6kvarmhl08", "name": "PEREZ, CIELO AINHOA"}, {"id": "ukmlcbtnhl08", "name": "PESARESI, JUANO"}, {"id": "uixxlydshl08", "name": "PESCE, EMMA"}, {"id": "udyiw2g8hl08", "name": "PLATERO ACOSTA, ALMUDENA"}, {"id": "u2nils7vhl08", "name": "PROCOPIOVICH, ISABELLA"}, {"id": "u0k67cophl08", "name": "SALIDO, OLIVIA"}, {"id": "us245qw9hl08", "name": "SARDO, MARTINA"}, {"id": "u0jcbbm6hl08", "name": "TORRES, MAXIMO AGUSTIN"}, {"id": "uad855yxhl08", "name": "VELAZCO, JOSEFINA ALMENDRA"}, {"id": "uxdvazo7hl08", "name": "VOLPONI, JUANA"}, {"id": "ua2ol2lmhl08", "name": "WANG XU, EDISON"}, {"id": "u63x53n1hl08", "name": "ZELINSCEK, MATEO"}]}, {"id": "ukap85gzxxvy", "name": "1B", "students": [{"id": "uwtpia0dy3f2", "name": "AIELLO, CAMILO"}, {"id": "uk9zo96gy3f2", "name": "AIELLO, PILAR"}, {"id": "u6escguvy3f2", "name": "ALZUGARAY, TOMAS EZEQUIEL"}, {"id": "u8870zhny3f2", "name": "AYE, AMELIA CONSTANZA"}, {"id": "ut2ygio9y3f2", "name": "BENITEZ QUISPE, MATTEO JOAQUIN"}, {"id": "uji1ym8my3f2", "name": "CESAR, KEI"}, {"id": "u11w58xly3f2", "name": "CORVALAN, VICTORIA GALA"}, {"id": "u024isyjy3f2", "name": "DACOSTA, MALENA PIA"}, {"id": "u8xwgh76y3f2", "name": "DEL VECCHIO, AGUSTINA"}, {"id": "uz67gem1y3f2", "name": "FERRON, JUAN IGNACIO"}, {"id": "uhc9hyfwy3f2", "name": "FRITZ, GIOVANNI"}, {"id": "uh0o2czmy3f2", "name": "FRITZ, VITTO VALENTINO"}, {"id": "uujp7382y3f2", "name": "GALLUZZI, BENICIO DAMIAN"}, {"id": "ul2ldi8by3f2", "name": "GARCIA SANCHO, CATALINA FRIDA"}, {"id": "upna1z8vy3f2", "name": "GUZMAN FLORES, XIOMARA JAZMIN"}, {"id": "u4j9vv2uy3f2", "name": "LAMAS, BRUNO"}, {"id": "u4vu8l59y3f2", "name": "LEDESMA, FELIPE EZEQUIEL"}, {"id": "ufdhkdbuy3f2", "name": "LEGUIZAMON, JOAQUIN"}, {"id": "u0pj7meby3f2", "name": "LIN, ENZO"}, {"id": "urq0qluuy3f2", "name": "LOSADA, JUAN IGNACIO"}, {"id": "u0tjg178y3f2", "name": "MANUEL RAMOS, SANTINO"}, {"id": "u5e9kdtey3f2", "name": "MAZZOCHI, JOSEFINA"}, {"id": "uptzzcb3y3f2", "name": "MELSA ALARCON, ALMA"}, {"id": "u479g0aey3f2", "name": "MOREIRA, LEON"}, {"id": "ukbkhhkfy3f2", "name": "NOLASCO, LORENZO"}, {"id": "uwd6kgppy3f2", "name": "ORMACHEA, ISAAC ALEJO"}, {"id": "ucltxz4gy3f2", "name": "ORTA SALAS, VALENTINA"}, {"id": "ukufv5yqy3f2", "name": "ORTIZ MIRABAL, EMMANUEL"}, {"id": "uhbkxgngy3f2", "name": "RAVENNA, GIANNA"}, {"id": "u4xemd77y3f2", "name": "RIOS, MARIA LUJAN"}, {"id": "upj2itp3y3f2", "name": "RODRIGUEZ, AGUSTIN LIONEL"}, {"id": "udqvhqfcy3f2", "name": "SALA, BIANCA"}, {"id": "ux86b8ehy3f2", "name": "SIMON, NEITHAN VALENTIN"}, {"id": "uhz7c85dy3f2", "name": "SOBA, LUCIANA ISABEL"}, {"id": "u1qbk045y3f2", "name": "VALLEJOS, AZUL XIOMARA"}, {"id": "u02k9u4wy3f2", "name": "VASQUEZ, GUILLERMINA"}, {"id": "utlt0y1hy3f2", "name": "VAZQUEZ, LUNA EMILIA"}]}, {"id": "u8rwl23qe9ry", "name": "1C", "students": [{"id": "u2xzg92uexac", "name": "BATISTA, IAN FRANCO"}, {"id": "uuqv6004exac", "name": "BATISTA, YULIANA"}, {"id": "upyqpjxeexac", "name": "CAMOZZI, ISABELLA AGOSTINA"}, {"id": "u7dh4gz4exac", "name": "CASANOVA, EDUARDO GABRIEL"}, {"id": "ukd10n48exac", "name": "COHN, BASTIAN MARTIN"}, {"id": "ujzrnuevexac", "name": "CONTI, BRUNO"}, {"id": "uk0o5xutexac", "name": "DAMELIO, ROMA BIANCA"}, {"id": "u4a0fqwtexac", "name": "ESPINEL, OLIVIA"}, {"id": "ufqn9raoexac", "name": "ESQUIVEL, SALVADOR"}, {"id": "u0bdbr94exac", "name": "FIGUEIRAS, JOAQUIN EMANUEL"}, {"id": "uxwwx5zvexac", "name": "GARCILAZO VALDERRAMA, VALENTINO"}, {"id": "ucrd1s15exac", "name": "GOMEZ CONTRERAS, GIOVANNI"}, {"id": "utiab98gexac", "name": "GOMEZ, VICTORIA"}, {"id": "ua8fuq1rexac", "name": "MARANGUELLO, NOAH GARRIEL"}, {"id": "uz9o4lxzexac", "name": "MARISTANY, FRANCESCA JULIETA"}, {"id": "ufj4h4rqexac", "name": "MARTINEZ CHAZARRETA, VALENTINO"}, {"id": "uq4mzwjgexac", "name": "MOLINA ORTEGA, RAMIRO"}, {"id": "udwko4f0exac", "name": "PERALTA, RIANNE BENICIO"}, {"id": "ujvhhf2yexac", "name": "PINO, RENZO NAHUEL"}, {"id": "uwr9nb0cexac", "name": "ROBERTS, TOMAS"}, {"id": "u0e5djl8exac", "name": "ROMANO, BASTIAN"}, {"id": "uc5mr962exac", "name": "SACCHI, VALENTINO"}, {"id": "uop1se96exac", "name": "SALDIAS, LUCA"}, {"id": "unsg3nlwexac", "name": "SANDOVAL, ROMA"}, {"id": "uk04eqovexac", "name": "SAYAGO, ISABELLA"}, {"id": "ucffmdqiexac", "name": "TEVEZ, GIANNA ANTONELLA"}, {"id": "uuboh50hexac", "name": "VANDEN BOSCH, INDIANA"}, {"id": "usomjuzdexac", "name": "VEGA, RENATA JUANA"}, {"id": "ucb2kh8kexac", "name": "ZALAZAR, SALVADOR"}]}, {"id": "ux3cabgteg39", "name": "1D", "students": [{"id": "u1wiy9k2fdd4", "name": "ABRALDES, ANTONIA"}, {"id": "u0kcjh9pfdd4", "name": "ANTICO, VALENTINO"}, {"id": "uweho3slfdd4", "name": "ARANDA SOPHIA RENATA"}, {"id": "uejmhhr1fdd4", "name": "BERNARDI, MILO"}, {"id": "u028crfufdd4", "name": "BORZACCHINO, CHLOE"}, {"id": "uhbhulspfdd4", "name": "DEMUCHO MASCARENO, MATEO"}, {"id": "umpu5fdmfdd4", "name": "DIAZ DE VIVAR, LUNA CHARLOTTE"}, {"id": "uaegzwjxfdd4", "name": "DIOSQUEZ, INDIAGUILLERMINA"}, {"id": "umwnwfhpfdd4", "name": "GONZALEZ, NAHITAN LEON"}, {"id": "u55vbml1fdd4", "name": "LAMPONI, BENICIO LUCIANO"}, {"id": "uqaher1gfdd4", "name": "LANGE LEDESMA CARLOS JERONIMO"}, {"id": "u5x4ppwafdd4", "name": "LOSADA, EMMA"}, {"id": "uv71cplwfdd4", "name": "LUGO RAMOS, FELIPE"}, {"id": "uu3w1x1bfdd4", "name": "MAIDANA, BENICIO"}, {"id": "u6yxfk28fdd4", "name": "MARINOZZI, AGUSTINO GENNARO"}, {"id": "umw5659sfdd4", "name": "MOLINA ESPINOSA, JUSTINA"}, {"id": "uma89t3zfdd4", "name": "PAEMAA, BRUNO LAUTARO"}, {"id": "uptna5f1fdd4", "name": "RESTELLI, ANGRA ELIN"}, {"id": "u06e0gy2fdd4", "name": "RODRIGUEZ, FRANCESCA PIA"}, {"id": "u2qsd1o4fdd4", "name": "ROMERO, BENJAMIN BAUTISTA"}, {"id": "ulcmm7xxfdd4", "name": "SANTAMARIA, EVA"}, {"id": "uelrmr0wfdd4", "name": "SINCOVICH, TIZIANO"}, {"id": "uz74bm5cfdd4", "name": "VENTURA, BRUNO"}, {"id": "ud7f4lo4fdd4", "name": "VERA, MORENA FRANCHESCA"}, {"id": "uzcbuby8fdd4", "name": "VILLA, VICTORIA AHINARA"}, {"id": "uyeay6wmfdd4", "name": "VOLPE, APOLO"}, {"id": "usqn5zfhfdd4", "name": "ZABALA, AMBAR ESTEFANIA"}, {"id": "uavijz16fdd4", "name": "ZABALA, BIANCA AMPARO"}]}]}, {"id": "lv3", "name": "Secundaria", "grades": []}], "formato": "completo", "_precioExplicito": false, "precioBase": 1000}], "products": [{"id": "p1", "name": "CARPETA INSTITUCIONAL 3 FOTOS", "description": "Grupal + Con Maestra + Retrato · 20x28 cm", "price": 1000, "isBase": true, "isCanvas": false}, {"id": "p2", "name": "FOTO RETRATO EXTRA", "description": "Foto retrato individual 20x28 cm", "price": 6000, "isBase": false, "isCanvas": false}], "orders": [], "photoMap": {"u01ml5yrhl07": {"retrato": "3473", "maestra": "3475"}, "ui4fo9n3hl07": {"retrato": "3481", "maestra": "3482"}, "uaegce57hl07": {"retrato": "3487", "maestra": "3490"}, "uy7028h9hl07": {"retrato": "3494", "maestra": "3497"}, "uwm4jlrmhl07": {"retrato": "3501", "maestra": "3502"}, "u6adu20ohl07": {"retrato": "3507", "maestra": "3510"}, "uiheqoyvhl07": {"retrato": "3514", "maestra": "3517"}, "u5au3dxnhl07": {"retrato": "3519", "maestra": "3524"}, "ud10awoohl07": {"retrato": "3529", "maestra": "3531"}, "uqmcn52ihl07": {"retrato": "5524", "maestra": "5518"}, "u4khhl0bhl07": {"retrato": "3535", "maestra": "3542"}, "ufb3cjgshl08": {"retrato": "3547", "maestra": "3550"}, "uj894j78hl08": {"retrato": "3553", "maestra": "3555"}, "urkkrk4mhl08": {"retrato": "3561", "maestra": "3563"}, "u5zr4wtahl08": {"retrato": "3568", "maestra": "3571"}, "ulkrad51hl08": {"retrato": "3575", "maestra": "3576"}, "uu7aswmehl08": {"retrato": "3582", "maestra": "3585"}, "upmz5ub1hl08": {"retrato": "3589", "maestra": "3593"}, "uwxxrpgthl08": {"retrato": "3598", "maestra": "3601"}, "ujxaqfebhl08": {"retrato": "3605", "maestra": "3608"}, "u1dg6dfmhl08": {"retrato": "3611", "maestra": "3614"}, "ua6kvarmhl08": {"retrato": "3618", "maestra": "3621"}, "ukmlcbtnhl08": {"retrato": "3625", "maestra": "3627"}, "uixxlydshl08": {"retrato": "3633", "maestra": "3634"}, "udyiw2g8hl08": {"retrato": "3640", "maestra": "3644"}, "u2nils7vhl08": {"retrato": "3649", "maestra": "3654"}, "u0k67cophl08": {"retrato": "3657", "maestra": "3660"}, "us245qw9hl08": {"retrato": "3662", "maestra": "3667"}, "u0jcbbm6hl08": {"retrato": "3673", "maestra": "3676"}, "uad855yxhl08": {"retrato": "3683", "maestra": "3687"}, "uxdvazo7hl08": {"retrato": "3692", "maestra": "3696"}, "ua2ol2lmhl08": {"retrato": "3701", "maestra": "3704"}, "u63x53n1hl08": {"retrato": "3708", "maestra": "3711"}}, "cfg": {"mpToken": "APP_USR-2599224073150998-030220-0e78cd9413adc035258d5165745c270b-321584657", "claudeKey": "", "umInst": "instance166079", "umToken": "wu2dlmkasa2a5xfz", "pwd": "studiozeta", "discQty": 3, "discPct": 25, "appUrl": "https://studiozetas-ui.github.io/photostore-studiozeta", "photoPrefix": "SOC_"}, "images": {"logo": null, "prodImgs": {}}};
+  var DATOS_EMBEBIDOS = {"schools": [{"id": "sc1", "name": "CIMDIP & MIGUEL CANE", "levels": [{"id": "lv1", "name": "Jardin", "grades": [{"id": "uwtqn8ttgco2", "name": "SALA ROSA TM", "students": []}, {"id": "uusmwcskgtzc", "name": "SALA CELESTE TM", "students": []}, {"id": "ultnz7klh3nb", "name": "SALA AMARILLA TM", "students": []}, {"id": "um5wvlpnhfx2", "name": "SALA NARANJA TM", "students": []}]}, {"id": "lv2", "name": "Primaria", "grades": [{"id": "gr1", "name": "1A", "students": [{"id": "u01ml5yrhl07", "name": "ANDRZEJKOWICZ, PEDRO FELIX"}, {"id": "ui4fo9n3hl07", "name": "BIELICA CASAZZA, GUADALUPE"}, {"id": "uaegce57hl07", "name": "BRAUN, BRUNO PAUL"}, {"id": "uy7028h9hl07", "name": "CHELOTTI, TOBIAS"}, {"id": "uwm4jlrmhl07", "name": "CHIAPPE, FRANCESCA OLIVIA"}, {"id": "u6adu20ohl07", "name": "CRISTALDO, ROMAN EZEQUIEL"}, {"id": "uiheqoyvhl07", "name": "DI BELLA ORTEGA, VICENTE"}, {"id": "u5au3dxnhl07", "name": "FIGUEROA, JULIA"}, {"id": "ud10awoohl07", "name": "FRATTASI, VALENTINA"}, {"id": "uqmcn52ihl07", "name": "GATTI, LUCIANA"}, {"id": "u4khhl0bhl07", "name": "GHERBESI, HELENA"}, {"id": "ufb3cjgshl08", "name": "GIULIANETTI BELTRAMINO, JULIA"}, {"id": "uj894j78hl08", "name": "HILLIER, FELICITAS"}, {"id": "urkkrk4mhl08", "name": "LALIN, FIDEL"}, {"id": "u5zr4wtahl08", "name": "LASKO, ESTEFANO SEBASTIAN"}, {"id": "ulkrad51hl08", "name": "LOTIERZO, FRANCESCA"}, {"id": "uu7aswmehl08", "name": "MACHELLO, LUCA"}, {"id": "upmz5ub1hl08", "name": "MONTENEGRO, MARCOS BAUTISTA"}, {"id": "uwxxrpgthl08", "name": "NECOL BARROS, JULIAN"}, {"id": "ujxaqfebhl08", "name": "NOGUERA, LEANDRO VALENTIN"}, {"id": "u1dg6dfmhl08", "name": "PALUMBO, VICTORIA"}, {"id": "ua6kvarmhl08", "name": "PEREZ, CIELO AINHOA"}, {"id": "ukmlcbtnhl08", "name": "PESARESI, JUANO"}, {"id": "uixxlydshl08", "name": "PESCE, EMMA"}, {"id": "udyiw2g8hl08", "name": "PLATERO ACOSTA, ALMUDENA"}, {"id": "u2nils7vhl08", "name": "PROCOPIOVICH, ISABELLA"}, {"id": "u0k67cophl08", "name": "SALIDO, OLIVIA"}, {"id": "us245qw9hl08", "name": "SARDO, MARTINA"}, {"id": "u0jcbbm6hl08", "name": "TORRES, MAXIMO AGUSTIN"}, {"id": "uad855yxhl08", "name": "VELAZCO, JOSEFINA ALMENDRA"}, {"id": "uxdvazo7hl08", "name": "VOLPONI, JUANA"}, {"id": "ua2ol2lmhl08", "name": "WANG XU, EDISON"}, {"id": "u63x53n1hl08", "name": "ZELINSCEK, MATEO"}]}, {"id": "ukap85gzxxvy", "name": "1B", "students": [{"id": "uwtpia0dy3f2", "name": "AIELLO, CAMILO"}, {"id": "uk9zo96gy3f2", "name": "AIELLO, PILAR"}, {"id": "u6escguvy3f2", "name": "ALZUGARAY, TOMAS EZEQUIEL"}, {"id": "u8870zhny3f2", "name": "AYE, AMELIA CONSTANZA"}, {"id": "ut2ygio9y3f2", "name": "BENITEZ QUISPE, MATTEO JOAQUIN"}, {"id": "uji1ym8my3f2", "name": "CESAR, KEI"}, {"id": "u11w58xly3f2", "name": "CORVALAN, VICTORIA GALA"}, {"id": "u024isyjy3f2", "name": "DACOSTA, MALENA PIA"}, {"id": "u8xwgh76y3f2", "name": "DEL VECCHIO, AGUSTINA"}, {"id": "uz67gem1y3f2", "name": "FERRON, JUAN IGNACIO"}, {"id": "uhc9hyfwy3f2", "name": "FRITZ, GIOVANNI"}, {"id": "uh0o2czmy3f2", "name": "FRITZ, VITTO VALENTINO"}, {"id": "uujp7382y3f2", "name": "GALLUZZI, BENICIO DAMIAN"}, {"id": "ul2ldi8by3f2", "name": "GARCIA SANCHO, CATALINA FRIDA"}, {"id": "upna1z8vy3f2", "name": "GUZMAN FLORES, XIOMARA JAZMIN"}, {"id": "u4j9vv2uy3f2", "name": "LAMAS, BRUNO"}, {"id": "u4vu8l59y3f2", "name": "LEDESMA, FELIPE EZEQUIEL"}, {"id": "ufdhkdbuy3f2", "name": "LEGUIZAMON, JOAQUIN"}, {"id": "u0pj7meby3f2", "name": "LIN, ENZO"}, {"id": "urq0qluuy3f2", "name": "LOSADA, JUAN IGNACIO"}, {"id": "u0tjg178y3f2", "name": "MANUEL RAMOS, SANTINO"}, {"id": "u5e9kdtey3f2", "name": "MAZZOCHI, JOSEFINA"}, {"id": "uptzzcb3y3f2", "name": "MELSA ALARCON, ALMA"}, {"id": "u479g0aey3f2", "name": "MOREIRA, LEON"}, {"id": "ukbkhhkfy3f2", "name": "NOLASCO, LORENZO"}, {"id": "uwd6kgppy3f2", "name": "ORMACHEA, ISAAC ALEJO"}, {"id": "ucltxz4gy3f2", "name": "ORTA SALAS, VALENTINA"}, {"id": "ukufv5yqy3f2", "name": "ORTIZ MIRABAL, EMMANUEL"}, {"id": "uhbkxgngy3f2", "name": "RAVENNA, GIANNA"}, {"id": "u4xemd77y3f2", "name": "RIOS, MARIA LUJAN"}, {"id": "upj2itp3y3f2", "name": "RODRIGUEZ, AGUSTIN LIONEL"}, {"id": "udqvhqfcy3f2", "name": "SALA, BIANCA"}, {"id": "ux86b8ehy3f2", "name": "SIMON, NEITHAN VALENTIN"}, {"id": "uhz7c85dy3f2", "name": "SOBA, LUCIANA ISABEL"}, {"id": "u1qbk045y3f2", "name": "VALLEJOS, AZUL XIOMARA"}, {"id": "u02k9u4wy3f2", "name": "VASQUEZ, GUILLERMINA"}, {"id": "utlt0y1hy3f2", "name": "VAZQUEZ, LUNA EMILIA"}]}, {"id": "u8rwl23qe9ry", "name": "1C", "students": [{"id": "u2xzg92uexac", "name": "BATISTA, IAN FRANCO"}, {"id": "uuqv6004exac", "name": "BATISTA, YULIANA"}, {"id": "upyqpjxeexac", "name": "CAMOZZI, ISABELLA AGOSTINA"}, {"id": "u7dh4gz4exac", "name": "CASANOVA, EDUARDO GABRIEL"}, {"id": "ukd10n48exac", "name": "COHN, BASTIAN MARTIN"}, {"id": "ujzrnuevexac", "name": "CONTI, BRUNO"}, {"id": "uk0o5xutexac", "name": "DAMELIO, ROMA BIANCA"}, {"id": "u4a0fqwtexac", "name": "ESPINEL, OLIVIA"}, {"id": "ufqn9raoexac", "name": "ESQUIVEL, SALVADOR"}, {"id": "u0bdbr94exac", "name": "FIGUEIRAS, JOAQUIN EMANUEL"}, {"id": "uxwwx5zvexac", "name": "GARCILAZO VALDERRAMA, VALENTINO"}, {"id": "ucrd1s15exac", "name": "GOMEZ CONTRERAS, GIOVANNI"}, {"id": "utiab98gexac", "name": "GOMEZ, VICTORIA"}, {"id": "ua8fuq1rexac", "name": "MARANGUELLO, NOAH GARRIEL"}, {"id": "uz9o4lxzexac", "name": "MARISTANY, FRANCESCA JULIETA"}, {"id": "ufj4h4rqexac", "name": "MARTINEZ CHAZARRETA, VALENTINO"}, {"id": "uq4mzwjgexac", "name": "MOLINA ORTEGA, RAMIRO"}, {"id": "udwko4f0exac", "name": "PERALTA, RIANNE BENICIO"}, {"id": "ujvhhf2yexac", "name": "PINO, RENZO NAHUEL"}, {"id": "uwr9nb0cexac", "name": "ROBERTS, TOMAS"}, {"id": "u0e5djl8exac", "name": "ROMANO, BASTIAN"}, {"id": "uc5mr962exac", "name": "SACCHI, VALENTINO"}, {"id": "uop1se96exac", "name": "SALDIAS, LUCA"}, {"id": "unsg3nlwexac", "name": "SANDOVAL, ROMA"}, {"id": "uk04eqovexac", "name": "SAYAGO, ISABELLA"}, {"id": "ucffmdqiexac", "name": "TEVEZ, GIANNA ANTONELLA"}, {"id": "uuboh50hexac", "name": "VANDEN BOSCH, INDIANA"}, {"id": "usomjuzdexac", "name": "VEGA, RENATA JUANA"}, {"id": "ucb2kh8kexac", "name": "ZALAZAR, SALVADOR"}]}, {"id": "ux3cabgteg39", "name": "1D", "students": [{"id": "u1wiy9k2fdd4", "name": "ABRALDES, ANTONIA"}, {"id": "u0kcjh9pfdd4", "name": "ANTICO, VALENTINO"}, {"id": "uweho3slfdd4", "name": "ARANDA SOPHIA RENATA"}, {"id": "uejmhhr1fdd4", "name": "BERNARDI, MILO"}, {"id": "u028crfufdd4", "name": "BORZACCHINO, CHLOE"}, {"id": "uhbhulspfdd4", "name": "DEMUCHO MASCARENO, MATEO"}, {"id": "umpu5fdmfdd4", "name": "DIAZ DE VIVAR, LUNA CHARLOTTE"}, {"id": "uaegzwjxfdd4", "name": "DIOSQUEZ, INDIAGUILLERMINA"}, {"id": "umwnwfhpfdd4", "name": "GONZALEZ, NAHITAN LEON"}, {"id": "u55vbml1fdd4", "name": "LAMPONI, BENICIO LUCIANO"}, {"id": "uqaher1gfdd4", "name": "LANGE LEDESMA CARLOS JERONIMO"}, {"id": "u5x4ppwafdd4", "name": "LOSADA, EMMA"}, {"id": "uv71cplwfdd4", "name": "LUGO RAMOS, FELIPE"}, {"id": "uu3w1x1bfdd4", "name": "MAIDANA, BENICIO"}, {"id": "u6yxfk28fdd4", "name": "MARINOZZI, AGUSTINO GENNARO"}, {"id": "umw5659sfdd4", "name": "MOLINA ESPINOSA, JUSTINA"}, {"id": "uma89t3zfdd4", "name": "PAEMAA, BRUNO LAUTARO"}, {"id": "uptna5f1fdd4", "name": "RESTELLI, ANGRA ELIN"}, {"id": "u06e0gy2fdd4", "name": "RODRIGUEZ, FRANCESCA PIA"}, {"id": "u2qsd1o4fdd4", "name": "ROMERO, BENJAMIN BAUTISTA"}, {"id": "ulcmm7xxfdd4", "name": "SANTAMARIA, EVA"}, {"id": "uelrmr0wfdd4", "name": "SINCOVICH, TIZIANO"}, {"id": "uz74bm5cfdd4", "name": "VENTURA, BRUNO"}, {"id": "ud7f4lo4fdd4", "name": "VERA, MORENA FRANCHESCA"}, {"id": "uzcbuby8fdd4", "name": "VILLA, VICTORIA AHINARA"}, {"id": "uyeay6wmfdd4", "name": "VOLPE, APOLO"}, {"id": "usqn5zfhfdd4", "name": "ZABALA, AMBAR ESTEFANIA"}, {"id": "uavijz16fdd4", "name": "ZABALA, BIANCA AMPARO"}]}]}, {"id": "lv3", "name": "Secundaria", "grades": [{"id": "u787kqvxidac", "name": "1A SEC TM", "students": []}, {"id": "ur5tl14rilbx", "name": "2A SEC TM", "students": []}, {"id": "u8bgxf0kj5wd", "name": "1C SEC TM", "students": []}, {"id": "u36apck6jchi", "name": "2C SEC TM", "students": []}]}], "formato": "completo", "_precioExplicito": false}, {"id": "uuuvnsxq26pm", "name": "LORETO", "formato": "solo_retrato", "precioBase": 100, "levels": []}, {"id": "u2f27jkr2q1q", "name": "ENSPA", "formato": "solo_retrato", "precioBase": 100, "levels": []}, {"id": "uo21b2f0u1p3", "name": "JARDIN GARABATOS DE COLORES", "formato": "solo_retrato", "precioBase": 100, "levels": []}], "products": [{"id": "p1", "name": "CARPETA INSTITUCIONAL 3 FOTOS", "description": "Grupal + Con Maestra + Retrato · 20x28 cm", "price": 100, "isBase": true, "isCanvas": false}, {"id": "p2", "name": "FOTO RETRATO EXTRA", "description": "Foto retrato individual 20x28 cm", "price": 50, "isBase": false, "isCanvas": false}], "orders": [], "photoMap": {"u01ml5yrhl07": {"retrato": "3473", "maestra": "3475"}, "ui4fo9n3hl07": {"retrato": "3481", "maestra": "3482"}, "uaegce57hl07": {"retrato": "3487", "maestra": "3490"}, "uy7028h9hl07": {"retrato": "3494", "maestra": "3497"}, "uwm4jlrmhl07": {"retrato": "3501", "maestra": "3502"}, "u6adu20ohl07": {"retrato": "3507", "maestra": "3510"}, "uiheqoyvhl07": {"retrato": "3514", "maestra": "3517"}, "u5au3dxnhl07": {"retrato": "3519", "maestra": "3524"}, "ud10awoohl07": {"retrato": "3529", "maestra": "3531"}, "uqmcn52ihl07": {"retrato": "5524", "maestra": "5518"}, "u4khhl0bhl07": {"retrato": "3535", "maestra": "3542"}, "ufb3cjgshl08": {"retrato": "3547", "maestra": "3550"}, "uj894j78hl08": {"retrato": "3553", "maestra": "3555"}, "urkkrk4mhl08": {"retrato": "3561", "maestra": "3563"}, "u5zr4wtahl08": {"retrato": "3568", "maestra": "3571"}, "ulkrad51hl08": {"retrato": "3575", "maestra": "3576"}, "uu7aswmehl08": {"retrato": "3582", "maestra": "3585"}, "upmz5ub1hl08": {"retrato": "3589", "maestra": "3593"}, "uwxxrpgthl08": {"retrato": "3598", "maestra": "3601"}, "ujxaqfebhl08": {"retrato": "3605", "maestra": "3608"}, "u1dg6dfmhl08": {"retrato": "3611", "maestra": "3614"}, "ua6kvarmhl08": {"retrato": "3618", "maestra": "3621"}, "ukmlcbtnhl08": {"retrato": "3625", "maestra": "3627"}, "uixxlydshl08": {"retrato": "3633", "maestra": "3634"}, "udyiw2g8hl08": {"retrato": "3640", "maestra": "3644"}, "u2nils7vhl08": {"retrato": "3649", "maestra": "3654"}, "u0k67cophl08": {"retrato": "3657", "maestra": "3660"}, "us245qw9hl08": {"retrato": "3662", "maestra": "3667"}, "u0jcbbm6hl08": {"retrato": "3673", "maestra": "3676"}, "uad855yxhl08": {"retrato": "3683", "maestra": "3687"}, "uxdvazo7hl08": {"retrato": "3692", "maestra": "3696"}, "ua2ol2lmhl08": {"retrato": "3701", "maestra": "3704"}, "u63x53n1hl08": {"retrato": "3708", "maestra": "3711"}}, "images": {"logo": null, "prodImgs": {}}, "cfg": {"mpToken": "", "claudeKey": "", "umInst": "instance166079", "umToken": "wu2dlmkasa2a5xfz", "pwd": "", "discQty": 3, "discPct": 25, "appUrl": "https://studiozetas-ui.github.io/photostore/", "photoPrefix": "SOC_"}};
   try{
     var raw=localStorage.getItem('psz4');
     if(raw){
@@ -210,24 +210,31 @@ function irAColegio(idx){
 }
 function irAdmin(){ ST.view='admin'; R(); }
 function buildLanding(){
+  var esAdmin=new URLSearchParams(window.location.search).get('admin')==='1';
   var logo=ST.images&&ST.images.logo
-    ?'<img src="'+ST.images.logo+'" style="max-width:200px;max-height:80px;object-fit:contain;border-radius:10px;margin-bottom:16px">'
-    :'<div style="font-size:56px;margin-bottom:8px">📸</div>';
-  var html='<div style="min-height:100vh;background:linear-gradient(160deg,#0f172a 0%,#1e1b4b 60%,#0f172a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px">';
-  html+='<div style="text-align:center;max-width:400px;width:100%">';
+    ?'<img src="'+ST.images.logo+'" style="max-width:220px;max-height:90px;object-fit:contain;border-radius:12px;margin-bottom:20px">'
+    :'<div style="font-size:64px;margin-bottom:8px">📸</div><h1 style="font-size:32px;font-weight:900;color:#fff;margin-bottom:4px;font-style:italic">Studio <span style="color:#818cf8">Zeta</span></h1><p style="color:#64748b;font-size:11px;letter-spacing:4px;text-transform:uppercase;margin-bottom:20px">Plataforma de Gestion de Fotos Escolares</p>';
+  var html='<div style="min-height:100vh;background:linear-gradient(160deg,#0f172a 0%,#1e1b4b 60%,#0f172a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center">';
+  html+='<div style="max-width:420px;width:100%">';
   html+=logo;
-  if(!ST.images||!ST.images.logo){
-    html+='<h1 style="font-size:28px;font-weight:900;color:#fff;margin-bottom:6px;font-style:italic">Studio <span style="color:#818cf8">Zeta</span></h1>';
-    html+='<p style="color:#64748b;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin-bottom:24px">Fotografia Escolar</p>';
-  }
-  html+='<div style="background:#1e293b;border:1px solid #334155;border-radius:20px;padding:24px;margin-bottom:16px">';
-  html+='<p style="color:#94a3b8;font-size:14px;margin-bottom:16px;line-height:1.5">Elegi el colegio de tu hijo/a</p>';
+  html+='<div style="background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(124,58,237,.15));border:1px solid rgba(99,102,241,.3);border-radius:20px;padding:28px 24px;margin-bottom:20px">';
+  html+='<div style="font-size:26px;font-weight:900;color:#fff;margin-bottom:8px">¡Pedí tus fotos acá!</div>';
+  html+='<p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-bottom:20px">Elegí tu colegio, buscá al alumno y comprá tu pack de fotos en minutos. <strong style="color:#a5b4fc">Facil, rapido y seguro.</strong></p>';
+  html+='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;text-align:left">';
+  html+='<div style="display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:13px"><span style="font-size:18px">✅</span> Elegis el pack que queres</div>';
+  html+='<div style="display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:13px"><span style="font-size:18px">💳</span> Pagas con Mercado Pago</div>';
+  html+='<div style="display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:13px"><span style="font-size:18px">🎉</span> MP te entrega el comprobante</div>';
+  html+='</div>';
+  html+='<p style="color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px">Selecciona tu colegio</p>';
   ST.schools.forEach(function(sc,idx){
-    html+='<button onclick="irAColegio('+idx+')" style="width:100%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:14px;padding:16px 20px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 14px rgba(79,70,229,.4)">';
-    html+='<span>🏫 '+esc(sc.name)+'</span><span>→</span></button>';
+    html+='<button onclick="irAColegio('+idx+')" style="width:100%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:14px;padding:18px 20px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 20px rgba(79,70,229,.4)">';
+    html+='<span>🏫 '+esc(sc.name)+'</span><span style="font-size:22px">→</span></button>';
   });
   html+='</div>';
-  html+='<button onclick="irAdmin()" style="background:none;border:1px solid #334155;color:#475569;border-radius:10px;padding:8px 16px;font-size:12px;cursor:pointer">⚙️ Admin</button>';
+  if(esAdmin){
+    html+='<button onclick="irAdmin()" style="margin-top:8px;background:none;border:1px solid #1e293b;color:#334155;border-radius:10px;padding:8px 16px;font-size:11px;cursor:pointer">⚙️ Admin</button>';
+  }
+  html+='<p style="color:#1e293b;font-size:10px;margin-top:20px">Studio Zeta Fotografia & Video</p>';
   html+='</div></div>';
   return html;
 }
@@ -1441,36 +1448,52 @@ function chgExtIdx(ei,d){
 
 async function doPagar(){
   var phone=((gel('store_phone')||{}).value||'').trim();
-  if(!phone){alert('Ingresa tu numero de celular.');return;}
+  if(!phone && !ST.modoPrueba){alert('Ingresa tu numero de celular.');return;}
+  if(!phone) phone='PRUEBA';
   var school=ST.schools.find(function(s){return s.id===ST.sel.school;});
   var level=school&&(school.levels||[]).find(function(l){return l.id===ST.sel.level;});
   var grade=level&&(level.grades||[]).find(function(g){return g.id===ST.sel.grade;});
   var student=grade&&(grade.students||[]).find(function(st){return st.id===ST.sel.student;});
   var pack=ST.products.find(function(p){return p.id===ST.sel.pack;});
-  var totExtQty=Object.values(ST.sel.extras||{}).reduce(function(a,b){return a+b;},0);
-  var hasDisc=totExtQty>=ST.cfg.discQty;
-  var qty=ST.sel.qty||1;
+  var totExtQty=Object.values(ST.sel.extras).reduce(function(a,b){return a+b;},0);
+  var hasDisc=totExtQty>=ST.cfg.discQty; var qty=ST.sel.qty||1;
   var items=[];
-  if(pack&&qty>0){
-    var precioPackFinal = (school&&school.precioBase&&school._precioExplicito) ? school.precioBase : pack.price;
-    items.push({name:pack.name,qty:qty,price:precioPackFinal});
-  }
-  Object.keys(ST.sel.extras||{}).forEach(function(pid){
+  if(pack)items.push({name:pack.name,qty:qty,price:pack.price});
+  Object.keys(ST.sel.extras).forEach(function(pid){
     var q=ST.sel.extras[pid];
     var p=ST.products.find(function(p){return p.id===pid;});
-    if(!p||!q) return;
+    if(!p||!q)return;
     items.push({name:p.name,qty:q,price:hasDisc?roundNice(p.price*(1-ST.cfg.discPct/100)):p.price});
   });
   var total=items.reduce(function(a,i){return a+i.price*i.qty;},0);
-  if(!total){alert('El total es 0. Selecciona al menos un producto.');return;}
   var order={
-    id:uid(),studentId:student&&student.id,studentName:student&&student.name||'',
-    schoolName:school&&school.name||'',levelName:level&&level.name||'',gradeName:grade&&grade.name||'',
-    phone:phone,status:'pending',paymentMethod:'mp',total:total,
+    id:uid(),
+    studentId:student&&student.id,
+    studentName:student&&student.name||'',
+    schoolName:school&&school.name||'',
+    levelName:level&&level.name||'',
+    gradeName:grade&&grade.name||'',
+    phone:phone,
+    status:'pending',
+    paymentMethod:'mp',
+    total:total,
     items:items.map(function(i){return{name:i.name,qty:i.qty,price:i.price};}),
-    createdAt:Date.now()
+    createdAt:Date.now(),
+    esPrueba:ST.modoPrueba||false
   };
-  ST.orders.push(order);saveData();
+  ST.orders.push(order);
+  saveData();
+
+  // MODO PRUEBA: salta MP, marca pagado directo
+  if(ST.modoPrueba){
+    order.status='paid';
+    saveData();
+    var sb=gel('root')&&gel('root').querySelector('.s-body');
+    if(sb) sb.innerHTML='<div style="text-align:center;padding:50px 20px"><div style="font-size:64px;margin-bottom:13px">🧪</div><h2 style="font-size:22px;font-weight:900;color:#fbbf24;margin-bottom:8px">COMPRA DE PRUEBA</h2><p style="color:#94a3b8;font-size:14px;margin-bottom:5px">Registrada sin cobro real</p><p style="font-size:17px;color:#fff;margin-bottom:4px">'+esc(student&&student.name||'')+'</p><p style="font-size:24px;font-weight:900;color:#34d399;margin-bottom:26px">'+fmt(total)+'</p><button class="btn btn-G btn-sm" onclick="goStore()">Nueva compra</button></div>';
+    return;
+  }
+
+  // PAGO REAL con MP
   if(ST.cfg.mpToken&&ST.cfg.mpToken.length>10){
     try{
       var resp=await fetch('https://api.mercadopago.com/checkout/preferences',{
@@ -1479,18 +1502,24 @@ async function doPagar(){
         body:JSON.stringify({
           items:items.map(function(i){return{title:i.name,unit_price:i.price,quantity:i.qty,currency_id:'ARS'};}),
           external_reference:order.id,
-          back_urls:{success:ST.cfg.appUrl+'?status=success&order='+order.id,failure:ST.cfg.appUrl+'?status=failure',pending:ST.cfg.appUrl+'?status=pending'},
+          back_urls:{
+            success:ST.cfg.appUrl+'?status=success&order='+order.id,
+            failure:ST.cfg.appUrl+'?status=failure',
+            pending:ST.cfg.appUrl+'?status=pending'
+          },
           auto_return:'approved'
         })
       });
       var data=await resp.json();
       if(data.init_point){window.location.href=data.init_point;return;}
-    }catch(e){console.error('MP',e);}
+    }catch(e){console.error('MP error:',e);}
   }
-  order.status='paid';saveData();
-  await sendWA(order);
+
+  // Sin token MP: marcar como pagado igual
+  order.status='paid';
+  saveData();
   var sb=gel('root')&&gel('root').querySelector('.s-body');
-  if(sb) mostrarConfirmacion(sb, student&&student.name||'', total);
+  if(sb) sb.innerHTML='<div style="text-align:center;padding:50px 20px"><div style="font-size:64px;margin-bottom:13px">✅</div><h2 style="font-size:22px;font-weight:900;color:#fff;margin-bottom:8px">Pedido registrado</h2><p style="color:#94a3b8;font-size:14px;margin-bottom:5px">Presenta este comprobante al retirar las fotos</p><p style="font-size:17px;color:#fff;margin-bottom:4px">'+esc(student&&student.name||'')+'</p><p style="font-size:24px;font-weight:900;color:#34d399;margin-bottom:26px">'+fmt(total)+'</p><button class="btn btn-G btn-sm" onclick="goStore()">Nueva compra</button></div>';
 }
 function mostrarConfirmacion(el, nombre, total){
   el.innerHTML = '';
@@ -1535,16 +1564,15 @@ function checkMP(){
     ST.view='admin'; return;
   }
 
-  // ?colegio=ID → tienda filtrada por colegio
+  // ?colegio=ID → tienda filtrada
   if(p.get('colegio')){
-    var scId=p.get('colegio');
-    var sc=ST.schools.find(function(s){return s.id===scId;});
-    if(sc){ ST.sel.school=scId; }
+    var sc=ST.schools.find(function(s){return s.id===p.get('colegio');});
+    if(sc) ST.sel.school=sc.id;
     ST.view='store'; ST.step=1; return;
   }
 
-  // Por defecto → tienda (los padres ven la tienda)
-  ST.view='store'; ST.step=1;
+  // Por defecto → landing (padres eligen colegio)
+  ST.view='landing';
 }
 
 
@@ -1928,7 +1956,10 @@ document.addEventListener('change', function(e){
 });
 // ─── ARRANQUE ───
 loadData();
-ST.view='admin'; // sin contraseña por ahora
+// Seguridad: sin ?admin=1 en URL, nadie puede ver el admin
+if(new URLSearchParams(window.location.search).get('admin') !== '1'){
+  ST.view = 'landing';
+}
 checkMP();
 R();
 </script>
