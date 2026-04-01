@@ -722,18 +722,62 @@ function buildOrders(){
   var all=[].concat(ST.orders).sort(function(a,b){return b.createdAt-a.createdAt;});
   var paid=all.filter(function(o){return o.status==='paid';});
   var cob=paid.reduce(function(a,o){return a+o.total;},0);
-  var html='<div class="ph"><span class="pt">🧾 Pedidos</span><div style="display:flex;gap:8px;align-items:center"><button class="btn btn-S btn-sm" onclick="addCashOrder()">💵 Efectivo manual</button><div style="text-align:right"><div style="font-size:20px;font-weight:900;color:#34d399">'+fmt(cob)+'</div><div style="font-size:11px;color:#64748b">cobrado</div></div></div></div>';
-  html+='<div class="sg sg4"><div class="stat"><div class="sn" style="color:#fff">'+all.length+'</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px">Total</div></div><div class="stat"><div class="sn" style="color:#34d399">'+paid.length+'</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px">Pagados</div></div><div class="stat"><div class="sn" style="color:#fbbf24">'+all.filter(function(o){return o.status==='pending';}).length+'</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px">Pendientes</div></div><div class="stat"><div class="sn" style="color:#60a5fa">'+all.filter(function(o){return o.paymentMethod==='cash';}).length+'</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px">Efectivo</div></div></div>';
-  if(!all.length)return html+'<div style="text-align:center;padding:50px;color:#475569"><div style="font-size:48px;margin-bottom:12px">🧾</div><p>Sin pedidos. Hace una compra de prueba en la Tienda.</p></div>';
+  var html='<div class="ph"><span class="pt">🧾 Pedidos</span><div style="display:flex;gap:8px;align-items:center">';
+  html+='<button class="btn btn-S btn-sm" onclick="addCashOrder()">💵 Efectivo manual</button>';
+  html+='<div style="text-align:right"><div style="font-size:20px;font-weight:900;color:#34d399">'+fmt(cob)+'</div><div style="font-size:11px;color:#64748b">cobrado</div></div>';
+  html+='</div></div>';
+  html+='<div class="sg sg4" style="margin-bottom:16px">';
+  html+='<div class="stat"><div class="sn" style="color:#fff">'+all.length+'</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px">Total</div></div>';
+  html+='<div class="stat"><div class="sn" style="color:#34d399">'+paid.length+'</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px">Pagados</div></div>';
+  html+='<div class="stat"><div class="sn" style="color:#fbbf24">'+all.filter(function(o){return o.status==="pending";}).length+'</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px">Pendientes</div></div>';
+  html+='<div class="stat"><div class="sn" style="color:#60a5fa">'+all.filter(function(o){return o.paymentMethod==="cash";}).length+'</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px">Efectivo</div></div>';
+  html+='</div>';
+  if(!all.length){
+    html+='<div style="text-align:center;padding:50px;color:#475569"><div style="font-size:48px;margin-bottom:12px">🧾</div><p>Sin pedidos aun.</p></div>';
+    return html;
+  }
+  // Agrupar por colegio + grado
+  var grupos={};
+  var gruposKeys=[];
   all.forEach(function(o,idx){
-    var sc=o.status==='paid'?'bg':'ba';
-    var sl=o.status==='paid'?'✅ Pagado':'⏳ Pendiente';
-    var pc=o.paymentMethod==='cash'?'bb':'bi';
-    var pl=o.paymentMethod==='cash'?'💵 Efectivo':'💳 MP';
-    html+='<div class="oc"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px"><span style="font-weight:700;font-size:15px;color:#fff">'+esc(o.studentName||'—')+'</span><span class="badge '+sc+'">'+sl+'</span><span class="badge '+pc+'">'+pl+'</span></div><div style="font-size:11px;color:#94a3b8;margin-bottom:2px">'+esc(o.gradeName||'')+' · '+fmtDate(o.createdAt)+'</div><div style="font-size:12px;color:#cbd5e1">'+(o.items||[]).map(function(i){return esc(i.name)+(i.qty>1?' x'+i.qty:'');}).join(' · ')+'</div></div><div style="text-align:right;flex-shrink:0"><div style="font-size:18px;font-weight:900;color:#fff">'+fmt(o.total)+'</div><div style="display:flex;gap:4px;margin-top:5px;justify-content:flex-end">';
-    if(o.status!=='paid')html+='<button class="btn btn-G btn-xs" onclick="oPay('+idx+')">✅ Pagar</button>';
-    html+='<button class="btn-danger" onclick="oDel('+idx+')">🗑️ Eliminar</button>';
-    html+='</div></div></div></div>';
+    var key=(o.schoolName||'Sin colegio')+'|||'+(o.gradeName||'Sin grado');
+    if(!grupos[key]){grupos[key]={school:o.schoolName||'Sin colegio',grade:o.gradeName||'Sin grado',orders:[],idxs:[]};gruposKeys.push(key);}
+    grupos[key].orders.push(o);
+    grupos[key].idxs.push(idx);
+  });
+  gruposKeys.forEach(function(key){
+    var g=grupos[key];
+    var gpaid=g.orders.filter(function(o){return o.status==="paid";});
+    var gtot=gpaid.reduce(function(a,o){return a+o.total;},0);
+    html+='<div style="background:#0f172a;border-left:3px solid #6366f1;border-radius:0 10px 10px 0;padding:10px 14px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center">';
+    html+='<div><div style="font-weight:900;color:#a5b4fc;font-size:13px;text-transform:uppercase;letter-spacing:1px">'+esc(g.school)+'</div>';
+    html+='<div style="font-size:16px;font-weight:900;color:#fff">'+esc(g.grade)+'</div></div>';
+    html+='<div style="text-align:right;font-size:12px;color:#64748b">'+gpaid.length+' pagados<br>'+fmt(gtot)+'</div>';
+    html+='</div>';
+    g.orders.forEach(function(o,i){
+      var realIdx=g.idxs[i];
+      var esPrueba=o.esPrueba?' <span style="font-size:10px;background:rgba(245,158,11,.2);color:#fbbf24;border-radius:20px;padding:2px 6px">PRUEBA</span>':'';
+      html+='<div class="oc" style="margin-left:16px;margin-bottom:6px">';
+      html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">';
+      html+='<div style="flex:1;min-width:0">';
+      html+='<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px">';
+      html+='<span style="font-weight:700;font-size:14px;color:#fff">'+esc(o.studentName||'—')+'</span>';
+      if(o.status==="paid") html+='<span class="badge bg">✅ Pagado</span>';
+      else html+='<span class="badge ba">⏳ Pendiente</span>';
+      if(o.paymentMethod==="cash") html+='<span class="badge bb">💵 Efectivo</span>';
+      else html+='<span class="badge bi">💳 MP</span>';
+      html+=esPrueba;
+      html+='</div>';
+      html+='<div style="font-size:11px;color:#64748b">'+fmtDate(o.createdAt)+'</div>';
+      html+='<div style="font-size:12px;color:#cbd5e1">'+(o.items||[]).map(function(it){return esc(it.name)+(it.qty>1?' x'+it.qty:'');}).join(' · ')+'</div>';
+      html+='</div>';
+      html+='<div style="text-align:right;flex-shrink:0">';
+      html+='<div style="font-size:17px;font-weight:900;color:#fff">'+fmt(o.total)+'</div>';
+      html+='<div style="display:flex;gap:4px;margin-top:5px;justify-content:flex-end">';
+      if(o.status!=="paid") html+='<button class="btn btn-G btn-xs" onclick="oPay('+realIdx+')">✅ Pagar</button>';
+      html+='<button class="btn-danger" onclick="oDel('+realIdx+')">🗑️</button>';
+      html+='</div></div></div></div>';
+    });
   });
   return html;
 }
@@ -753,22 +797,70 @@ function oPay(idx){
   var f=ST.orders.find(function(x){return x.id===o.id;});
   if(f){f.status='paid';saveData();if(f.phone)sendWA(f);R();}
 }
+function cerrarOvEfectivo(){
+  var ov=document.getElementById('ov-efectivo');
+  if(ov) ov.parentNode.removeChild(ov);
+}
 function addCashOrder(){
-  modalPrompt('Colegio:', function(sn){
-    modalPrompt('Grado:', function(gn){
-      modalPrompt('Apellido y Nombre del alumno:', function(stName){
-        modalPrompt('Celular (dejar vacio si no tiene):', function(phone){
-          var base=ST.products.find(function(p){return p.isBase;});
-          var o={id:uid(),studentName:stName,schoolName:sn,levelName:'',gradeName:gn,
-            phone:phone||'',status:'paid',paymentMethod:'cash',
-            total:base?base.price:0,
-            items:base?[{name:base.name,qty:1,price:base.price}]:[],
-            createdAt:Date.now()};
-          ST.orders.push(o);saveData();if(phone)sendWA(o);R();
-        });
+  var opts=[];
+  ST.schools.forEach(function(sc){
+    (sc.levels||[]).forEach(function(lv){
+      (lv.grades||[]).forEach(function(gr){
+        if((gr.students||[]).length>0){
+          opts.push({label:sc.name+' — '+gr.name, sc:sc.id, lv:lv.id, gr:gr.id, students:gr.students});
+        }
       });
     });
   });
+  if(!opts.length){alert('No hay grados con alumnos cargados.');return;}
+  window._cashOpts=opts;
+  var opHtml=opts.map(function(op,i){return '<option value="'+i+'">'+esc(op.label)+'</option>';}).join('');
+  var div=document.createElement('div');
+  div.id='ov-efectivo';
+  div.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  div.innerHTML='<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:24px;width:100%;max-width:360px">'
+    +'<div style="font-weight:900;color:#fff;font-size:16px;margin-bottom:16px">💵 Pago en Efectivo</div>'
+    +'<label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Colegio / Grado</label>'
+    +'<select id="em_grado" style="width:100%;background:#0f172a;border:1.5px solid #334155;border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:10px;box-sizing:border-box"><option value="">-- Elegí --</option>'+opHtml+'</select>'
+    +'<label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Alumno</label>'
+    +'<select id="em_alumno" style="width:100%;background:#0f172a;border:1.5px solid #334155;border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:10px;box-sizing:border-box"><option value="">-- Elegí el grado primero --</option></select>'
+    +'<label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Celular (opcional)</label>'
+    +'<input id="em_phone" type="tel" style="width:100%;background:#0f172a;border:1.5px solid #334155;border-radius:8px;padding:10px;color:#fff;font-size:14px;margin-bottom:14px;box-sizing:border-box" placeholder="11 2345-6789">'
+    +'<div style="display:flex;gap:8px">'
+    +'<button onclick="confirmarEfectivo()" style="flex:1;background:#059669;color:#fff;border:none;border-radius:9px;padding:12px;font-weight:700;cursor:pointer;font-size:14px">✅ Registrar</button>'
+    +'<button onclick="cerrarOvEfectivo()" style="flex:1;background:#334155;color:#fff;border:none;border-radius:9px;padding:12px;font-weight:700;cursor:pointer;font-size:14px">Cancelar</button>'
+    +'</div></div>';
+  document.body.appendChild(div);
+  document.getElementById('em_grado').addEventListener('change',function(){
+    var idx=parseInt(this.value);
+    var sel=document.getElementById('em_alumno');
+    sel.innerHTML='<option value="">-- Elegí --</option>';
+    if(!isNaN(idx)&&window._cashOpts[idx]){
+      window._cashOpts[idx].students.forEach(function(st,i){
+        sel.innerHTML+='<option value="'+i+'">'+esc(st.name)+'</option>';
+      });
+    }
+  });
+}
+function confirmarEfectivo(){
+  var gradoIdx=parseInt((document.getElementById('em_grado')||{}).value);
+  var alumnoIdx=parseInt((document.getElementById('em_alumno')||{}).value);
+  var phone=((document.getElementById('em_phone')||{}).value||'').trim();
+  if(isNaN(gradoIdx)||gradoIdx<0||!window._cashOpts[gradoIdx]){alert('Elegi un grado.');return;}
+  if(isNaN(alumnoIdx)||alumnoIdx<0){alert('Elegi un alumno.');return;}
+  var op=window._cashOpts[gradoIdx];
+  var sc=ST.schools.find(function(s){return s.id===op.sc;});
+  var lv=sc&&(sc.levels||[]).find(function(l){return l.id===op.lv;});
+  var gr=lv&&(lv.grades||[]).find(function(g){return g.id===op.gr;});
+  var st=gr&&gr.students[alumnoIdx];
+  if(!st){alert('Error al encontrar alumno.');return;}
+  var base=ST.products.find(function(p){return p.isBase;});
+  var o={id:uid(),studentId:st.id,studentName:st.name,schoolName:sc.name,levelName:lv.name,gradeName:gr.name,phone:phone,status:'paid',paymentMethod:'cash',total:base?base.price:0,items:base?[{name:base.name,qty:1,price:base.price}]:[],createdAt:Date.now()};
+  ST.orders.push(o);
+  saveData();
+  cerrarOvEfectivo();
+  R();
+  alert('Registrado: '+st.name+' — '+gr.name);
 }
 
 // ─── WHATSAPP ───
