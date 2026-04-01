@@ -1010,22 +1010,62 @@ function doPDF(){
 function buildPlanilla(){
   var paid=ST.orders.filter(function(o){return o.status==='paid';});
   var html='<div class="ph"><span class="pt">📊 Planilla</span><div style="display:flex;gap:6px"><button class="btn btn-R btn-sm" onclick="doPDF()">📄 Descargar PDF</button><button class="btn btn-G btn-sm" onclick="doBAT()">⚡ Generar .BAT</button></div></div>';
-  if(!paid.length)return html+'<div style="text-align:center;padding:50px;color:#475569"><div style="font-size:48px;margin-bottom:12px">📊</div><p>Sin pedidos pagados.</p></div>';
-  var byGrade={};
-  paid.forEach(function(o){var k=(o.gradeName||'');if(!byGrade[k])byGrade[k]={gn:o.gradeName,sn:o.schoolName,orders:[]};byGrade[k].orders.push(o);});
+  if(!paid.length) return html+'<div style="text-align:center;padding:50px;color:#475569"><div style="font-size:48px;margin-bottom:12px">📊</div><p>Sin pedidos pagados.</p></div>';
+
+  // Agrupar por colegio + grado
+  var grupos={};
+  var gruposKeys=[];
+  paid.forEach(function(o){
+    var key=(o.schoolName||'Sin colegio')+'|||'+(o.gradeName||'Sin grado');
+    if(!grupos[key]){grupos[key]={sc:o.schoolName||'',gn:o.gradeName||'',orders:[]};gruposKeys.push(key);}
+    grupos[key].orders.push(o);
+  });
+
   html+='<div>';
-  Object.values(byGrade).forEach(function(gr){
-    var tc=gr.orders.reduce(function(a,o){var bi=(o.items||[]).find(function(it){return ST.products.find(function(p){return p.name===it.name&&p.isBase;});});return a+(bi?bi.qty:0);},0);
+  gruposKeys.forEach(function(key){
+    var gr=grupos[key];
+    var tc=gr.orders.reduce(function(a,o){
+      var bi=(o.items||[]).find(function(it){return ST.products.find(function(p){return p.name===it.name&&p.isBase;});});
+      return a+(bi?bi.qty:0);
+    },0);
+    var te=gr.orders.reduce(function(a,o){
+      var ex=(o.items||[]).filter(function(it){return !ST.products.find(function(p){return p.name===it.name&&p.isBase;});});
+      return a+ex.reduce(function(b,it){return b+it.qty;},0);
+    },0);
     var tot=gr.orders.reduce(function(a,o){return a+o.total;},0);
-    html+='<div style="margin-bottom:20px"><div style="font-weight:900;background:#1e293b;border-radius:10px;padding:10px 14px;border:1px solid #334155;display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><span>'+esc(gr.gn||'')+'</span><span style="font-size:12px;color:#94a3b8">'+gr.orders.length+' alumnos · '+tc+' carpetas · '+fmt(tot)+'</span></div>';
-    html+='<div class="tw"><table><thead><tr><th>#</th><th>Alumno</th><th>Carpetas</th><th>Retrato</th><th>Con Seno</th><th>Total</th><th>Canal</th></tr></thead><tbody>';
+
+    // Título con COLEGIO + GRADO
+    html+='<div style="margin-bottom:20px">';
+    html+='<div style="background:#1e293b;border-radius:10px;padding:10px 14px;border:1px solid #334155;margin-bottom:7px">';
+    html+='<div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">'+esc(gr.sc)+'</div>';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center">';
+    html+='<span style="font-weight:900;color:#fff;font-size:16px">'+esc(gr.gn)+'</span>';
+    html+='<span style="font-size:12px;color:#94a3b8">'+gr.orders.length+' alumnos · '+tc+' carpetas'+(te>0?' · '+te+' extras':'')+' · '+fmt(tot)+'</span>';
+    html+='</div></div>';
+
+    html+='<div class="tw"><table><thead><tr>';
+    html+='<th>#</th><th>Alumno</th><th>Carpetas</th><th>Extras</th><th>Retrato</th><th>Con Seno</th><th>Total</th><th>Canal</th>';
+    html+='</tr></thead><tbody>';
+
     gr.orders.forEach(function(o,i){
       var pm=ST.photoMap[o.studentId]||{};
       var bi=(o.items||[]).find(function(it){return ST.products.find(function(p){return p.name===it.name&&p.isBase;});});
       var bq=bi?bi.qty:1;
-      html+='<tr><td style="color:#64748b">'+(i+1)+'</td><td>'+esc(o.studentName)+'</td><td><strong style="color:'+(bq>1?'#fbbf24':'#34d399')+'">x'+bq+'</strong></td><td style="font-family:monospace;color:#6ee7b7;font-size:11px">'+(pm.retrato||'—')+'</td><td style="font-family:monospace;color:#a5b4fc;font-size:11px">'+(pm.maestra||'—')+'</td><td><strong>'+fmt(o.total)+'</strong></td><td>'+(o.paymentMethod==='cash'?'💵':'💳')+'</td></tr>';
+      // Extras: todo lo que no es base
+      var exItems=(o.items||[]).filter(function(it){return !ST.products.find(function(p){return p.name===it.name&&p.isBase;});});
+      var exStr=exItems.length?exItems.map(function(it){return 'x'+it.qty;}).join(' '):'—';
+      html+='<tr>';
+      html+='<td style="color:#64748b">'+(i+1)+'</td>';
+      html+='<td>'+esc(o.studentName)+'</td>';
+      html+='<td><strong style="color:'+(bq>1?'#fbbf24':'#34d399')+'">x'+bq+'</strong></td>';
+      html+='<td style="color:#f472b6;font-weight:700">'+exStr+'</td>';
+      html+='<td style="font-family:monospace;color:#6ee7b7;font-size:11px">'+(pm.retrato||'—')+'</td>';
+      html+='<td style="font-family:monospace;color:#a5b4fc;font-size:11px">'+(pm.maestra||'—')+'</td>';
+      html+='<td><strong>'+fmt(o.total)+'</strong></td>';
+      html+='<td>'+(o.paymentMethod==='cash'?'💵':'💳')+'</td>';
+      html+='</tr>';
     });
-    html+='<tr class="td-foot"><td colspan="4" style="text-align:right">TOTAL:</td><td colspan="3" style="color:#34d399">'+fmt(tot)+'</td></tr>';
+    html+='<tr class="td-foot"><td colspan="5" style="text-align:right">TOTAL:</td><td colspan="3" style="color:#34d399">'+fmt(tot)+'</td></tr>';
     html+='</tbody></table></div></div>';
   });
   html+='</div>';
