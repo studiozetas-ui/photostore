@@ -113,7 +113,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="root"></div>
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
-var APP_VERSION="1781550485";
+var APP_VERSION="1781551858";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -2007,7 +2007,8 @@ function syncFromSheets(){
     var n=0;
     (data.orders||[]).forEach(function(o){
       if(!ST.orders.find(function(ex){return ex.id===o.id;})){
-        ST.orders.push({id:o.id,studentName:o.studentName,schoolName:o.schoolName,gradeName:o.gradeName,phone:o.phone,total:parseFloat(o.total)||0,status:'paid',paymentMethod:o.canal==='Sobre'?'cash':'mp',items:[{name:o.productos,qty:1,price:parseFloat(o.total)||0}],createdAt:new Date(o.fecha).getTime()||Date.now()});
+        var esP=['4A','4B','4C','4D'].indexOf(o.gradeName)>=0||(o.productos&&o.productos.toLowerCase().indexOf('diploma')>=0);
+        ST.orders.push({id:o.id,studentName:o.studentName,schoolName:o.schoolName,gradeName:o.gradeName,phone:o.phone,total:parseFloat(o.total)||0,status:'paid',paymentMethod:o.canal==='Sobre'?'cash':'mp',items:[{name:o.productos,qty:1,price:parseFloat(o.total)||0}],createdAt:new Date(o.fecha).getTime()||Date.now(),esPromesa:!!esP});
         n++;
       }
     });
@@ -2024,7 +2025,13 @@ function checkMP(){
     var o=ST.orders.find(function(o){return o.id===oid;});
     if(o&&o.status!=='paid'){o.status='paid';saveData();sendWA(o);sendToSheets(o);}
     history.replaceState({},'',window.location.pathname);
-    ST.step=1; ST.view='store'; return;
+    // Volver a la sección correcta según el tipo de pedido
+    if(o&&o.esPromesa){
+      ST.view='promesa_ok'; // Pantalla de éxito Promesa
+    } else {
+      ST.step=1; ST.view='store'; // Volver a tienda institucional
+    }
+    return;
   }
   if(p.get('admin')==='1'){
     // PIN: si ya está verificado en esta PC, entrar directo
@@ -2495,7 +2502,8 @@ setTimeout(function(){
     var n=0;
     data.orders.forEach(function(o){
       if(!ST.orders.find(function(ex){return ex.id===o.id;})){
-        ST.orders.push({id:o.id,studentName:o.studentName,schoolName:o.schoolName,gradeName:o.gradeName,phone:o.phone,total:parseFloat(o.total)||0,status:'paid',paymentMethod:o.canal==='Sobre'?'cash':'mp',items:[{name:o.productos,qty:1,price:parseFloat(o.total)||0}],createdAt:new Date(o.fecha).getTime()||Date.now()});
+        var esP=['4A','4B','4C','4D'].indexOf(o.gradeName)>=0||(o.productos&&o.productos.toLowerCase().indexOf('diploma')>=0);
+        ST.orders.push({id:o.id,studentName:o.studentName,schoolName:o.schoolName,gradeName:o.gradeName,phone:o.phone,total:parseFloat(o.total)||0,status:'paid',paymentMethod:o.canal==='Sobre'?'cash':'mp',items:[{name:o.productos,qty:1,price:parseFloat(o.total)||0}],createdAt:new Date(o.fecha).getTime()||Date.now(),esPromesa:!!esP});
         n++;
       }
     });
@@ -2884,7 +2892,8 @@ function buildPromesaCompra(){
     html+='<div style="text-align:center;padding:40px;color:#475569">Lista de alumnos no cargada aún.</div>';
   } else {
     html+='<label style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Buscá tu nombre</label>';
-    html+='<input id="prom_buscar" type="text" placeholder="Escribí tu apellido..." style="width:100%;background:#1e293b;border:1.5px solid #334155;border-radius:10px;padding:12px;color:#fff;font-size:15px;margin-bottom:14px;box-sizing:border-box">';
+    html+='<input id="prom_buscar" type="text" placeholder="Escribí tu apellido..." style="width:100%;background:#1e293b;border:1.5px solid #334155;border-radius:10px;padding:12px;color:#fff;font-size:15px;margin-bottom:8px;box-sizing:border-box">';
+    html+='<div style="font-size:11px;color:#64748b;margin-bottom:10px">Podés comprar para varios alumnos tocando cada nombre.</div>';
     html+='<div id="prom_lista">';
     alumnos.forEach(function(st){
       var yaPago=ST.orders.find(function(o){return o.studentId===st.id&&o.status==='paid'&&o.esPromesa;});
@@ -3465,6 +3474,9 @@ function buildAdminPromesa(){
         var nuevos=0;
         (data.orders||[]).forEach(function(o){
           if(!ST.orders.find(function(ex){return ex.id===o.id;})){
+            // Detectar si es Promesa por el grado o nombre del producto
+            var esPromesa=['4A','4B','4C','4D'].indexOf(o.gradeName)>=0||
+              (o.productos&&o.productos.toLowerCase().indexOf('diploma')>=0);
             ST.orders.push({
               id:o.id,
               studentName:o.studentName,
@@ -3474,9 +3486,9 @@ function buildAdminPromesa(){
               total:parseFloat(o.total)||0,
               status:'paid',
               paymentMethod:o.canal==='Sobre'?'cash':'mp',
-              items:[{name:'Foto con Diploma '+o.gradeName,qty:1,price:parseFloat(o.total)||0}],
+              items:[{name:o.productos||('Foto con Diploma '+o.gradeName),qty:1,price:parseFloat(o.total)||0}],
               createdAt:new Date(o.fecha).getTime()||Date.now(),
-              esPromesa:true
+              esPromesa:!!esPromesa
             });
             nuevos++;
           }
@@ -3609,6 +3621,31 @@ function simularComprasMasivas(){
   saveData();
   alert('Simulacion completada: '+simulados+' compras generadas en los 4 grados.');
   R();
+}
+
+function buildPromesaOk(){
+  // Buscar el último pedido de promesa pagado
+  var ultimo=ST.orders.filter(function(o){return o.status==='paid'&&o.esPromesa;})
+    .sort(function(a,b){return b.createdAt-a.createdAt;})[0];
+  var html='<div style="min-height:100vh;background:linear-gradient(160deg,#0a0f1e,#0d1a0d);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center">';
+  html+='<div style="font-size:72px;margin-bottom:16px">✅</div>';
+  html+='<div style="font-weight:900;color:#4ade80;font-size:24px;margin-bottom:8px">Pago exitoso</div>';
+  if(ultimo){
+    html+='<div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:4px">'+esc(ultimo.studentName)+'</div>';
+    html+='<div style="color:#64748b;font-size:13px;margin-bottom:4px">4to '+ultimo.gradeName.replace('4','')+'</div>';
+    html+='<div style="color:#4ade80;font-size:20px;font-weight:900;margin-bottom:16px">'+fmt(ultimo.total)+'</div>';
+  }
+  html+='<p style="color:#94a3b8;font-size:13px;margin-bottom:24px">Tu foto del día de la Promesa<br>está reservada. Te la entregaremos<br>en el colegio.</p>';
+  html+='<button id="btn-comprar-otro" style="background:linear-gradient(135deg,#065f46,#047857);color:#fff;border:none;border-radius:14px;padding:16px 32px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;width:100%;max-width:300px">📸 Comprar para otro alumno</button>';
+  html+='<button id="btn-volver-inicio-prom" style="background:none;border:1px solid #334155;color:#64748b;border-radius:14px;padding:12px 32px;font-size:13px;cursor:pointer;width:100%;max-width:300px">Volver al inicio</button>';
+  html+='</div>';
+  setTimeout(function(){
+    var btnOtro=document.getElementById('btn-comprar-otro');
+    if(btnOtro) btnOtro.addEventListener('click',function(){ST.view='promesa';R();});
+    var btnInicio=document.getElementById('btn-volver-inicio-prom');
+    if(btnInicio) btnInicio.addEventListener('click',function(){ST.view='landing';ST.colegioFiltro=null;R();});
+  },50);
+  return html;
 }
 
 </script>
