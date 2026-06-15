@@ -113,7 +113,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="root"></div>
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
-var APP_VERSION="1781495516";
+var APP_VERSION="1781496326";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -163,6 +163,7 @@ function loadData(){
   }catch(e){console.error('loadData:',e);}
   ST.images=DATOS_EMBEBIDOS.images||{logo:null,prodImgs:{}};
   ST.cfg.mpToken=MP_TOKEN;
+  ST.cfg.promesaPrecio=100;
   if(!ST.cfg.adminPin) ST.cfg.adminPin=ADMIN_PIN;
   ST.cfg.sheetsUrl='https://script.google.com/macros/s/AKfycby3qNYZqV7yBcp7EmTVWnjDKyJj58sj_vp1qH1fjZ6DN8sgC3fjVD_vNObhg_e7yA/exec';
   ST.cfg.appUrl='https://studiozetas-ui.github.io/photostore/';
