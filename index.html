@@ -113,7 +113,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="root"></div>
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
-var APP_VERSION="1781554337";
+var APP_VERSION="1781556412";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -2025,11 +2025,12 @@ function checkMP(){
     var o=ST.orders.find(function(o){return o.id===oid;});
     if(o&&o.status!=='paid'){o.status='paid';saveData();sendWA(o);sendToSheets(o);}
     history.replaceState({},'',window.location.pathname);
-    // Volver a la sección correcta según el tipo de pedido
-    if(o&&o.esPromesa){
-      ST.view='promesa_ok'; // Pantalla de éxito Promesa
+    // Volver a la sección correcta
+    var esPromesaReturn=p.get('promesa')==='1'||(o&&o.esPromesa);
+    if(esPromesaReturn){
+      ST.view='promesa_ok';
     } else {
-      ST.step=1; ST.view='store'; // Volver a tienda institucional
+      ST.step=1; ST.view='store';
     }
     return;
   }
@@ -2956,7 +2957,7 @@ function comprarPromesa(stId,stName,gr){
     body:JSON.stringify({
       items:items.map(function(i){return{title:i.name,unit_price:i.price,quantity:i.qty,currency_id:'ARS'};}),
       external_reference:order.id,
-      back_urls:{success:appUrl+'?status=success&order='+order.id,failure:appUrl+'?status=failure',pending:appUrl+'?status=pending'},
+      back_urls:{success:appUrl+'?status=success&order='+order.id+'&promesa=1',failure:appUrl+'?promesa=1',pending:appUrl+'?promesa=1'},
       auto_return:'approved'
     })
   }).then(function(r){return r.json();}).then(function(d){
@@ -3043,10 +3044,19 @@ function buildPlanillaPromesa(){
   var total=paid.reduce(function(a,o){return a+o.total;},0);
 
   // Índice de compras por studentId
+  // Índice por studentId Y por nombre (para pedidos sincronizados desde Sheets)
   var compras={};
+  var comprasPorNombre={};
   paidAll.forEach(function(o){
-    if(!compras[o.studentId]) compras[o.studentId]=[];
-    compras[o.studentId].push(o);
+    if(o.studentId){
+      if(!compras[o.studentId]) compras[o.studentId]=[];
+      compras[o.studentId].push(o);
+    }
+    var nomKey=(o.studentName||'').toUpperCase().trim();
+    if(nomKey){
+      if(!comprasPorNombre[nomKey]) comprasPorNombre[nomKey]=[];
+      comprasPorNombre[nomKey].push(o);
+    }
   });
 
   var html='<div class="ph"><span class="pt">Planilla Promesa</span>';
@@ -3103,7 +3113,12 @@ function buildPlanillaPromesa(){
 
     alumnos.forEach(function(st,i){
       var nFoto=ST.photoMap[st.id]||'';
-      var comprasSt=compras[st.id]||[];
+      var nomKey=(st.name||'').toUpperCase().trim();
+      var comprasSt=(compras[st.id]||[]).concat(
+        (comprasPorNombre[nomKey]||[]).filter(function(o){
+          return !(compras[st.id]||[]).find(function(x){return x.id===o.id;});
+        })
+      );
       var compro=comprasSt.length>0;
       var qty=comprasSt.reduce(function(a,o){return a+(o.items||[]).reduce(function(b,it){return b+it.qty;},0);},0);
       var rowBg=compro?'rgba(34,197,94,.08)':'';
@@ -3207,8 +3222,12 @@ function buildPlanillaPromesa(){
       inputs.forEach(function(inp){
         var val=inp.value.trim();
         var stid=inp.getAttribute('data-stid');
-        if(val&&stid){ST.photoMap[stid]=val;count++;}
-        else if(!val&&stid){delete ST.photoMap[stid];}
+        if(val&&stid){
+          ST.photoMap[stid]=val;
+          // También guardar por nombre para mayor robustez
+          var inp2=document.querySelector('.inp-nfoto[data-stid="'+stid+'"]');
+          count++;
+        } else if(!val&&stid){delete ST.photoMap[stid];}
         inp.style.borderColor=val?'#22c55e':'#334155';
         inp.style.color=val?'#4ade80':'#94a3b8';
       });
@@ -3525,10 +3544,19 @@ function imprimirPlanillaPromesa(soloGrado){
   var cimdip=ST.schools.find(function(s){return s.name.indexOf('CIMDIP')>=0;});
   if(!cimdip) return;
   var paidAll=ST.orders.filter(function(o){return o.status==='paid'&&o.esPromesa;});
+  // Índice por studentId Y por nombre (para pedidos sincronizados desde Sheets)
   var compras={};
+  var comprasPorNombre={};
   paidAll.forEach(function(o){
-    if(!compras[o.studentId]) compras[o.studentId]=[];
-    compras[o.studentId].push(o);
+    if(o.studentId){
+      if(!compras[o.studentId]) compras[o.studentId]=[];
+      compras[o.studentId].push(o);
+    }
+    var nomKey=(o.studentName||'').toUpperCase().trim();
+    if(nomKey){
+      if(!comprasPorNombre[nomKey]) comprasPorNombre[nomKey]=[];
+      comprasPorNombre[nomKey].push(o);
+    }
   });
   var gradosImprimir=soloGrado?[soloGrado]:['4A','4B','4C','4D'];
   var html='<html><head><meta charset="UTF-8"><title>Planilla Promesa</title><style>';
@@ -3556,7 +3584,12 @@ function imprimirPlanillaPromesa(soloGrado){
     html+='<table><thead><tr><th>#</th><th>Apellido y Nombre</th><th>N° Foto</th><th>Compro</th><th>Copias</th><th>Canal</th></tr></thead><tbody>';
     alumnos.forEach(function(st,i){
       var nFoto=ST.photoMap[st.id]||'';
-      var comprasSt=compras[st.id]||[];
+      var nomKey=(st.name||'').toUpperCase().trim();
+      var comprasSt=(compras[st.id]||[]).concat(
+        (comprasPorNombre[nomKey]||[]).filter(function(o){
+          return !(compras[st.id]||[]).find(function(x){return x.id===o.id;});
+        })
+      );
       var compro=comprasSt.length>0;
       var qty=comprasSt.reduce(function(a,o){return a+(o.items||[]).reduce(function(b,it){return b+it.qty;},0);},0);
       var canal=compro?(comprasSt[0].paymentMethod==='cash'?'Efectivo':'MP'):'';
@@ -3624,26 +3657,33 @@ function simularComprasMasivas(){
 }
 
 function buildPromesaOk(){
-  // Buscar el último pedido de promesa pagado
   var ultimo=ST.orders.filter(function(o){return o.status==='paid'&&o.esPromesa;})
     .sort(function(a,b){return b.createdAt-a.createdAt;})[0];
-  var html='<div style="min-height:100vh;background:linear-gradient(160deg,#0a0f1e,#0d1a0d);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center">';
-  html+='<div style="font-size:72px;margin-bottom:16px">✅</div>';
-  html+='<div style="font-weight:900;color:#4ade80;font-size:24px;margin-bottom:8px">Pago exitoso</div>';
+  var gr=ultimo?ultimo.gradeName:'';
+  var html='<div style="min-height:100vh;min-height:100dvh;background:linear-gradient(160deg,#0a0f1e,#0d1a0d);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center">';
+  html+='<div style="font-size:72px;margin-bottom:12px">✅</div>';
+  html+='<div style="font-weight:900;color:#4ade80;font-size:26px;margin-bottom:8px">Pago exitoso</div>';
   if(ultimo){
-    html+='<div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:4px">'+esc(ultimo.studentName)+'</div>';
-    html+='<div style="color:#64748b;font-size:13px;margin-bottom:4px">4to '+ultimo.gradeName.replace('4','')+'</div>';
-    html+='<div style="color:#4ade80;font-size:20px;font-weight:900;margin-bottom:16px">'+fmt(ultimo.total)+'</div>';
+    html+='<div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);border-radius:12px;padding:16px 24px;margin-bottom:20px">';
+    html+='<div style="color:#fff;font-size:17px;font-weight:700;margin-bottom:4px">'+esc(ultimo.studentName)+'</div>';
+    html+='<div style="color:#64748b;font-size:13px;margin-bottom:4px">4to '+gr.replace('4','')+'</div>';
+    html+='<div style="color:#4ade80;font-size:22px;font-weight:900">'+fmt(ultimo.total)+'</div>';
+    html+='</div>';
   }
-  html+='<p style="color:#94a3b8;font-size:13px;margin-bottom:24px">Tu foto del día de la Promesa<br>está reservada. Te la entregaremos<br>en el colegio.</p>';
-  html+='<button id="btn-comprar-otro" style="background:linear-gradient(135deg,#065f46,#047857);color:#fff;border:none;border-radius:14px;padding:16px 32px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;width:100%;max-width:300px">📸 Comprar para otro alumno</button>';
-  html+='<button id="btn-volver-inicio-prom" style="background:none;border:1px solid #334155;color:#64748b;border-radius:14px;padding:12px 32px;font-size:13px;cursor:pointer;width:100%;max-width:300px">Volver al inicio</button>';
-  html+='</div>';
+  html+='<p style="color:#94a3b8;font-size:14px;line-height:1.7;margin-bottom:28px">La foto del día de la Promesa<br>está reservada. Se entrega en el colegio.</p>';
+  html+='<div style="width:100%;max-width:320px">';
+  html+='<button id="btn-comprar-otro" style="width:100%;background:linear-gradient(135deg,#065f46,#047857);color:#fff;border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px">📸 Comprar para otro alumno</button>';
+  html+='<button id="btn-volver-prom" style="width:100%;background:rgba(255,255,255,.05);border:1px solid #334155;color:#64748b;border-radius:14px;padding:14px;font-size:13px;cursor:pointer">Volver al inicio de Promesa</button>';
+  html+='</div></div>';
   setTimeout(function(){
-    var btnOtro=document.getElementById('btn-comprar-otro');
-    if(btnOtro) btnOtro.addEventListener('click',function(){ST.view='promesa';R();});
-    var btnInicio=document.getElementById('btn-volver-inicio-prom');
-    if(btnInicio) btnInicio.addEventListener('click',function(){ST.view='landing';ST.colegioFiltro=null;R();});
+    var b1=document.getElementById('btn-comprar-otro');
+    if(b1) b1.addEventListener('click',function(){
+      ST.promesaGrado=gr||null;
+      ST.view=gr?'promesa_compra':'promesa';
+      R();
+    });
+    var b2=document.getElementById('btn-volver-prom');
+    if(b2) b2.addEventListener('click',function(){ST.view='promesa';R();});
   },50);
   return html;
 }
