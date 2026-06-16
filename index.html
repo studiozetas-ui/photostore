@@ -113,7 +113,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="root"></div>
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
-var APP_VERSION="1781616748";
+var APP_VERSION="1781620494";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -3468,11 +3468,12 @@ function buildAdminPromesa(){
   html+='<div style="background:#1e293b;border:1px solid #334155;border-radius:14px;padding:16px;margin-bottom:14px">';
   html+='<div style="font-weight:700;color:#fff;font-size:14px;margin-bottom:8px">Sincronizacion y datos</div>';
   html+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
-  html+='<button class="btn btn-A btn-sm" id="btn-sync-prom">🔄 Sincronizar desde Sheets</button>';
-  html+='<button class="btn btn-S btn-sm" id="btn-simular">⚡ Simular 70% compras</button>';
+  html+='<button class="btn btn-A btn-sm" id="btn-sync-prom">🔄 Sincronizar</button>';
+  html+='<button class="btn btn-S btn-sm" id="btn-simular">⚡ Simular 70%</button>';
   html+='<button class="btn btn-R btn-sm" id="btn-limpiar-sim">🗑️ Limpiar pruebas</button>';
+  html+='<button class="btn btn-R btn-sm" id="btn-reset-prom" style="background:#7f1d1d">⚠️ RESETEAR TODO</button>';
   html+='</div>';
-  html+='<p style="font-size:11px;color:#475569;margin-top:8px">Sincronizar trae las compras reales desde Google Sheets. Simular genera compras de prueba (no afectan el total real).</p>';
+  html+='<p style="font-size:11px;color:#475569;margin-top:8px">RESETEAR borra TODOS los pedidos de Promesa (prueba y reales). Usarlo solo para empezar de cero.</p>';
   html+='</div>';
   html+='<div id="planilla-promesa-container">'+buildPlanillaPromesa()+'</div>';
   setTimeout(function(){
@@ -3534,10 +3535,19 @@ function buildAdminPromesa(){
     var limpBtn=document.getElementById('btn-limpiar-sim');
     if(limpBtn)limpBtn.addEventListener('click',function(){
       if(!confirm('Eliminar TODAS las compras de prueba/simulacion?')) return;
-      if(!confirm('SEGUNDA CONFIRMACION: Se eliminaran todas las compras marcadas como PRUEBA. Continuar?')) return;
+      if(!confirm('SEGUNDA CONFIRMACION: Continuar?')) return;
       ST.orders=ST.orders.filter(function(o){return !o.esPrueba;});
       saveData(); R();
       alert('Compras de prueba eliminadas.');
+    });
+    var resetBtn=document.getElementById('btn-reset-prom');
+    if(resetBtn)resetBtn.addEventListener('click',function(){
+      if(!confirm('ATENCION: Esto borra TODOS los pedidos de Promesa, incluyendo los reales. Solo usar para empezar de cero. Continuar?')) return;
+      if(!confirm('SEGUNDA CONFIRMACION FINAL: Se perderan TODOS los pedidos de Promesa. Seguro?')) return;
+      ST.orders=ST.orders.filter(function(o){return !o.esPromesa;});
+      ST.photoMap={};
+      saveData(); R();
+      alert('Todos los pedidos de Promesa eliminados. Empezas de cero.');
     });
   },50);
   return html;
