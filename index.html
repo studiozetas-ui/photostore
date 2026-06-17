@@ -113,7 +113,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="root"></div>
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
-var APP_VERSION="1781620494";
+var APP_VERSION="1781722471";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -2929,7 +2929,7 @@ function comprarPromesa(stId,stName,gr){
   var base=ST.products.find(function(p){return p.isBase;});
   if(!base){alert('No hay productos configurados.');return;}
   var precio=parseInt(ST.cfg.promesaPrecio)||8000;
-  var items=[{name:'Foto con Diploma - '+gr,qty:1,price:precio}];
+  var items=[{name:stName+' - '+gr,qty:1,price:precio}];
   var order={id:uid(),studentId:stId,studentName:stName,schoolName:'CIMDIP & MIGUEL CANE',levelName:'Primaria',gradeName:gr,phone:'',status:'pending',paymentMethod:'mp',total:precio,items:items,createdAt:Date.now(),esPromesa:true};
   ST.orders.push(order);
   saveData();
