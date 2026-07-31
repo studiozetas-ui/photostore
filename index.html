@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1785455087";
+  var APP_VERSION="1785463837";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -661,8 +661,12 @@ function normalizarYCargar(ev, si, li, gi){
       // Empezar a leer alumnos DESPUÉS de la fila de encabezado
       for(var i=headerRow+1;i<rows.length;i++){
         var n=String(rows[i][ni]||'').trim().replace(/^\d+\s*/,'').replace(/\s+/g,' ').trim();
-        // Saltar filas que sean encabezados o vacías
-        if(n&&n.length>2&&!/^(nombre|apellido|alumno|observaciones|se[nñ]o)/i.test(n))nms.push(n);
+        // Saltar filas que sean encabezados, títulos o vacías
+        var nLow=n.toLowerCase();
+        var esEncabezado=/^(nombre|apellido|alumno|observaciones|se[nñ]o|n[°º]|grado|nivel|retrato|con se|foto)/i.test(n)
+          || nLow==='nombre y apellido' || nLow.indexOf('nombre y apellido')>=0
+          || nLow.indexOf('apellido y nombre')>=0;
+        if(n && n.length>2 && !esEncabezado) nms.push(n);
       }
       if(!nms.length){alert('Sin nombres.');return;}
       cargarAlumnos(gr,nms);
