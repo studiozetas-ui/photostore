@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1785716414";
+  var APP_VERSION="1785717605";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -499,6 +499,10 @@ function buildSchools(){
               html+='<span style="font-size:12px;color:#94a3b8">📷 Nº foto grupal:</span>';
               html+='<input type="text" value="'+esc(gr.numGrupal||'')+'" placeholder="ej: 1300" onchange="setNumGrupal('+si+','+li+','+gi+',this.value)" style="width:90px;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:5px 8px;color:#fff;font-size:13px">';
               html+='<span style="font-size:11px;color:#64748b">(para descarga de fotos)</span>';
+              html+='</div>';
+              html+='<div style="padding:8px 12px;background:#0f172a;border-radius:8px;margin:4px 0">';
+              html+='<div style="font-size:11px;color:#94a3b8;margin-bottom:4px">📁 En Drive, creá una subcarpeta con ESTE nombre exacto:</div>';
+              html+='<div style="font-size:13px;color:#34d399;font-weight:700;font-family:monospace;background:#1e293b;padding:6px 10px;border-radius:6px;display:inline-block">'+esc(gr.name)+'</div>';
               html+='</div>';
               html+='<div class="tree-grado-b"><div style="max-height:220px;overflow-y:auto">';
               if(!(gr.students||[]).length) html+='<p style="font-size:12px;color:#64748b;padding:4px 0">Sin alumnos.</p>';
@@ -5990,8 +5994,9 @@ function descMostrarFotos(st, grObj, scObj, cont){
     card.innerHTML = '<div style="color:#818cf8;font-weight:700;font-size:14px;margin-bottom:8px">'+item.tipo+' (Nº '+item.num+')</div><div style="color:#64748b;font-size:12px">⏳ Buscando tu foto...</div>';
     grid.appendChild(card);
 
-    // Pedir la foto al Apps Script del Drive
-    fetch(fotosUrl + '?action=getFoto&num=' + encodeURIComponent(item.num))
+    // Pedir la foto al Apps Script del Drive (en la subcarpeta del grado)
+    var gradoNom = (grObj && grObj.name) ? grObj.name : '';
+    fetch(fotosUrl + '?action=getFoto&num=' + encodeURIComponent(item.num) + '&grado=' + encodeURIComponent(gradoNom))
       .then(function(r){ return r.json(); })
       .then(function(res){
         if(res.ok && res.encontrada){
