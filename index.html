@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1785811913";
+  var APP_VERSION="1785816187";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -399,7 +399,7 @@ function removeLandingCam(){
 
 function landingClear(){ST.sel.school=null;R();}
 function goStore(){
-  if(ST.sel)ST.sel.opcionSec='';if(ST.sel){ST.sel.extraSecOn=false;ST.sel.extraSecTipo='grupo';}ST.view='store';ST.step=1;ST.sel={school:null,level:null,grade:null,student:null,pack:null,extras:{},qty:1};R();}
+  if(ST.sel)ST.sel.opcionSec='';if(ST.sel){ST.sel.extraSecOn=false;ST.sel.extraSecTipo='grupo';}ST.view='store';ST.step=1;ST.sel={school:null,level:null,grade:null,student:null,pack:null,packs:{},extras:{},qty:1};R();}
 
 // ─── LOGIN ───
 function buildLogin(){
@@ -1715,11 +1715,13 @@ function selAlumno(id){
 function elegirOtraCarpeta(){
   ST.sel.qty=1;
   ST.sel.pack=null;
+  ST.sel.packs={};
   ST._yaCompro=true;  // flag para que buildS2 no muestre el aviso
   R();
 }
 function elegirSoloExtra(){
-  ST.sel.pack=null;  // sin pack base = no suma carpeta al total
+  ST.sel.pack=null;
+  ST.sel.packs={};  // sin pack base = no suma carpeta al total
   ST.sel.qty=0;
   ST.step=4;
   ST.sel.extras={};
@@ -1872,25 +1874,61 @@ function buildS2(){
 
   html+='<h3 style="font-size:16px;font-weight:900;color:#fff;margin-bottom:10px">Selecciona tu pack</h3>';
   bases.forEach(function(p,bi){
-    var sel=ST.sel.pack===p.id;
+    var esDig = esProductoDigital(p);
+    var cant = getPackQty(p.id);
+    var sel = cant>0;
     var img=(p.isBase&&esSecundaria&&ST.images.prodImgs&&ST.images.prodImgs['sec_carpeta'])
       ? ST.images.prodImgs['sec_carpeta']
       : (ST.images.prodImgs&&ST.images.prodImgs[p.id]);
-    html+='<button class="pack-opt'+(sel?' sel ':' ')+'" onclick="selPackIdx('+bi+')">';
+    var precioEfectivo = (school&&school.precioBase&&school._precioExplicito&&bases.length===1) ? school.precioBase : p.price;
+
+    html+='<div class="pack-opt'+(sel?' sel ':' ')+'" style="display:block">';
     html+='<div style="display:flex;align-items:center;gap:12px">';
-    html+=(img?'<img src="'+img+'" style="width:70px;height:70px;border-radius:9px;object-fit:cover">':'<div style="width:70px;height:70px;border-radius:9px;background:#334155;display:flex;align-items:center;justify-content:center;font-size:28px">+</div>');
-    var precioEfectivo = (school&&school.precioBase&&school._precioExplicito) ? school.precioBase : p.price;
-    html+='<div style="flex:1;min-width:0"><div style="font-size:17px;font-weight:900;color:#fff">'+esc(p.name)+'</div>';
+    html+=(img?'<img src="'+img+'" style="width:70px;height:70px;border-radius:9px;object-fit:cover">':'<div style="width:70px;height:70px;border-radius:9px;background:#334155;display:flex;align-items:center;justify-content:center;font-size:28px">📷</div>');
+    html+='<div style="flex:1;min-width:0"><div style="font-size:16px;font-weight:900;color:#fff">'+esc(p.name)+'</div>';
     html+='<div style="font-size:12px;color:#94a3b8">'+esc(p.description||'')+'</div>';
-    html+='<div style="font-size:22px;font-weight:900;color:#34d399;margin-top:4px">'+fmt(precioEfectivo*qty)+'</div></div>';
-    html+='</div>'+(sel?'<div style="color:#34d399;font-size:12px;margin-top:7px;text-align:center">Seleccionado</div>':'');
-    html+='</button>';
+    html+='<div style="font-size:20px;font-weight:900;color:#34d399;margin-top:4px">'+fmt(precioEfectivo)+(esDig?'':' c/u')+'</div></div>';
+    html+='</div>';
+
+    // Controles: digital = agregar/quitar; carpeta = selector de cantidad
+    if(esDig){
+      html+='<div style="margin-top:10px">';
+      if(sel){
+        html+='<button onclick="setPackQty(\''+p.id+'\',0)" style="width:100%;background:rgba(52,211,153,.15);border:1.5px solid #34d399;color:#34d399;border-radius:10px;padding:11px;font-weight:800;cursor:pointer">✓ Agregado — tocá para quitar</button>';
+      } else {
+        html+='<button onclick="setPackQty(\''+p.id+'\',1)" style="width:100%;background:#334155;border:1.5px solid #475569;color:#fff;border-radius:10px;padding:11px;font-weight:800;cursor:pointer">+ Agregar (archivos digitales)</button>';
+      }
+      html+='</div>';
+    } else {
+      html+='<div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px">';
+      html+='<span style="font-size:13px;color:#94a3b8">Cantidad:</span>';
+      html+='<div style="display:flex;align-items:center;gap:12px">';
+      html+='<button onclick="cambiarPackQty(\''+p.id+'\',-1)" style="width:38px;height:38px;border-radius:10px;background:#334155;border:none;color:#fff;font-size:22px;font-weight:900;cursor:pointer">−</button>';
+      html+='<span style="font-size:20px;font-weight:900;color:#fff;min-width:28px;text-align:center">'+cant+'</span>';
+      html+='<button onclick="cambiarPackQty(\''+p.id+'\',1)" style="width:38px;height:38px;border-radius:10px;background:#4f46e5;border:none;color:#fff;font-size:22px;font-weight:900;cursor:pointer">+</button>';
+      html+='</div>';
+      html+='</div>';
+      if(cant>0){
+        html+='<div style="margin-top:8px;text-align:right;font-size:13px;color:#34d399;font-weight:700">Subtotal: '+fmt(precioEfectivo*cant)+'</div>';
+      }
+    }
+    html+='</div>';
   });
 
   if(esSecundaria && ST.sel.pack && !ST.sel.opcionSec){
     html+='<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:10px;padding:12px;margin-top:14px;text-align:center;font-size:13px;color:#fbbf24">⚠️ Elegí arriba qué 3 fotos querés (Opción A o B) para continuar</div>';
   }
-  if(ST.sel.pack && (!esSecundaria || ST.sel.opcionSec))html+='<button class="pay-btn" style="margin-top:14px;font-size:17px;padding:15px" onclick="ST.step=4;ST.sel.extras={};R()">Continuar al pago</button>';
+  // Total de packs elegidos
+  var _totalPacks=0;
+  if(ST.sel.packs){ Object.keys(ST.sel.packs).forEach(function(pid){
+    var pq=parseInt(ST.sel.packs[pid])||0; if(pq<=0) return;
+    var pk=ST.products.find(function(p){return p.id===pid;});
+    if(pk) _totalPacks += pk.price*pq;
+  }); }
+  if(hayPackElegido() && (!esSecundaria || ST.sel.opcionSec)){
+    html+='<div style="margin-top:14px;padding:14px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.3);border-radius:12px;text-align:center"><div style="font-size:12px;color:#94a3b8">Total en carpetas</div><div style="font-size:24px;font-weight:900;color:#34d399">'+fmt(_totalPacks)+'</div></div>';
+    html+='<button class="pay-btn" style="margin-top:12px;font-size:17px;padding:15px" onclick="ST.step=4;ST.sel.extras={};R()">Continuar al pago</button>';
+  }
   html+='</div>';
   return html;
 }
@@ -1984,7 +2022,7 @@ function buildS4(){
     }
     return true;
   });
-  var _hayPack=!!ST.sel.pack;  // ¿ya eligió una carpeta?
+  var _hayPack=hayPackElegido();  // ¿ya eligió al menos una carpeta?
   if(retratoExtra && !esSecundariaS4){
     var qExtra=ST.sel.extras&&ST.sel.extras[retratoExtra.id]||0;
     var extrasOpen=ST._extrasOpen||false;
@@ -2132,9 +2170,10 @@ async function doPagar(){
   var grade=level&&(level.grades||[]).find(function(g){return g.id===ST.sel.grade;});
   var student=grade&&(grade.students||[]).find(function(st){return st.id===ST.sel.student;});
   var pack=ST.products.find(function(p){return p.id===ST.sel.pack;});
+  var _tienePack=hayPackElegido();
   var totExtQty=Object.values(ST.sel.extras).reduce(function(a,b){return (parseInt(a)||0)+(parseInt(b)||0);},0);
   // REGLA: los extras solo se pueden comprar junto con una carpeta/pack
-  if(!pack && totExtQty>0){
+  if(!_tienePack && totExtQty>0){
     var packsDisp=ST.products.filter(function(p){return p.isBase;});
     var _sc=ST.schools.find(function(s){return s.id===ST.sel.school;});
     if(_sc && _sc.productosBase && _sc.productosBase.length){
@@ -2149,7 +2188,18 @@ async function doPagar(){
   }
   var hasDisc=totExtQty>=ST.cfg.discQty; var qty=ST.sel.qty||1;
   var items=[];
-  if(pack)items.push({name:pack.name,qty:qty,price:pack.price});
+  // Agregar TODOS los packs elegidos con su cantidad
+  if(ST.sel.packs){
+    Object.keys(ST.sel.packs).forEach(function(pid){
+      var pq=parseInt(ST.sel.packs[pid])||0;
+      if(pq<=0) return;
+      var pk=ST.products.find(function(p){return p.id===pid;});
+      if(!pk) return;
+      items.push({name:pk.name, qty:pq, price:pk.price});
+    });
+  }
+  // Compatibilidad: si no hay packs{} pero sí ST.sel.pack (flujo viejo)
+  if(items.length===0 && pack){ items.push({name:pack.name,qty:qty,price:pack.price}); }
   Object.keys(ST.sel.extras).forEach(function(pid){
     var q=parseInt(ST.sel.extras[pid])||0;
     var p=ST.products.find(function(p){return p.id===pid;});
@@ -6113,6 +6163,37 @@ function getDemoFoto(tipo, colegioId){
 }
 
 function selDemoColegio(v){ _demoColegio = v; R(); }
+
+// ¿Es un producto digital? (no lleva selector de cantidad)
+function esProductoDigital(p){
+  if(!p) return false;
+  var n=(p.name||'').toUpperCase();
+  return p.isDigital===true || n.indexOf('DIGITAL')>=0 || n.indexOf('FOTOARCHIVO')>=0 || n.indexOf('ARCHIVO')>=0;
+}
+// Cantidad de un pack seleccionado
+function getPackQty(pid){ return (ST.sel.packs && parseInt(ST.sel.packs[pid])) || 0; }
+// ¿Hay al menos un pack elegido?
+function hayPackElegido(){
+  if(ST.sel.pack) return true;
+  if(ST.sel.packs){ for(var k in ST.sel.packs){ if(parseInt(ST.sel.packs[k])>0) return true; } }
+  return false;
+}
+
+function setPackQty(pid, q){
+  ST.sel.packs = ST.sel.packs || {};
+  q = parseInt(q)||0;
+  if(q<=0){ delete ST.sel.packs[pid]; }
+  else { ST.sel.packs[pid] = q; }
+  // Mantener ST.sel.pack apuntando al primer pack elegido (compatibilidad)
+  var first=null; for(var k in ST.sel.packs){ if(ST.sel.packs[k]>0){ first=k; break; } }
+  ST.sel.pack = first;
+  R();
+}
+function cambiarPackQty(pid, delta){
+  var actual = getPackQty(pid);
+  var nuevo = Math.max(0, actual + delta);
+  setPackQty(pid, nuevo);
+}
 </script>
 <!-- Panel numérico para tablet -->
 <button id="np-toggle-btn" class="np-toggle" onclick="toggleNumPanel()" title="Panel numérico">🔢</button>
