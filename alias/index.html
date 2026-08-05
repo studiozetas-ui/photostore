@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1785934986";
+  var APP_VERSION="1785937264";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -1972,7 +1972,7 @@ function renderRetratoExtra(school){
     }
     return true;
   });
-  var _hayPack=hayPackElegido();  // ¿ya eligió al menos una carpeta?
+  var _hayPack=hayCarpetaFisica();  // ¿ya eligió al menos una carpeta?
   if(retratoExtra && !esSecundariaS4){
     var qExtra=ST.sel.extras&&ST.sel.extras[retratoExtra.id]||0;
     var extrasOpen=ST._extrasOpen||false;
@@ -2200,17 +2200,17 @@ async function doPagar(){
   var grade=level&&(level.grades||[]).find(function(g){return g.id===ST.sel.grade;});
   var student=grade&&(grade.students||[]).find(function(st){return st.id===ST.sel.student;});
   var pack=ST.products.find(function(p){return p.id===ST.sel.pack;});
-  var _tienePack=hayPackElegido();
+  var _tieneCarpeta=hayCarpetaFisica();
   var totExtQty=Object.values(ST.sel.extras).reduce(function(a,b){return (parseInt(a)||0)+(parseInt(b)||0);},0);
-  // REGLA: los extras solo se pueden comprar junto con una carpeta/pack
-  if(!_tienePack && totExtQty>0){
-    var packsDisp=ST.products.filter(function(p){return p.isBase;});
+  // REGLA: el retrato extra solo se compra junto con una CARPETA con fotos (no con el combo digital solo)
+  if(!_tieneCarpeta && totExtQty>0){
+    var packsDisp=ST.products.filter(function(p){return p.isBase && !esProductoDigital(p);});
     var _sc=ST.schools.find(function(s){return s.id===ST.sel.school;});
     if(_sc && _sc.productosBase && _sc.productosBase.length){
       packsDisp=packsDisp.filter(function(p){return _sc.productosBase.indexOf(p.id)>=0;});
     }
     var nombresPacks=packsDisp.map(function(p){return p.name+' ($'+p.price+')';}).join(', ');
-    if(confirm('Para llevar un extra (como el retrato adicional) tenés que comprar al menos una carpeta.\n\nOpciones disponibles: '+nombresPacks+'\n\n¿Querés elegir una carpeta ahora?')){
+    if(confirm('El retrato extra solo se puede sumar a una CARPETA con fotos (no al combo digital solo).\n\nCarpetas disponibles: '+nombresPacks+'\n\n¿Querés elegir una carpeta ahora?')){
       // Volver al paso de elegir pack
       ST.step=2; R();
     }
@@ -6229,6 +6229,23 @@ function getPackQty(pid){ return (ST.sel.packs && parseInt(ST.sel.packs[pid])) |
 function hayPackElegido(){
   if(ST.sel.pack) return true;
   if(ST.sel.packs){ for(var k in ST.sel.packs){ if(parseInt(ST.sel.packs[k])>0) return true; } }
+  return false;
+}
+// ¿Hay al menos una CARPETA FÍSICA (no digital) elegida? El retrato extra solo se habilita con esto.
+function hayCarpetaFisica(){
+  if(ST.sel.packs){
+    for(var k in ST.sel.packs){
+      if(parseInt(ST.sel.packs[k])>0){
+        var pk=ST.products.find(function(p){return p.id===k;});
+        if(pk && !esProductoDigital(pk)) return true;
+      }
+    }
+  }
+  // Compat: si solo está ST.sel.pack (flujo viejo)
+  if(ST.sel.pack){
+    var pk2=ST.products.find(function(p){return p.id===ST.sel.pack;});
+    if(pk2 && !esProductoDigital(pk2)) return true;
+  }
   return false;
 }
 
