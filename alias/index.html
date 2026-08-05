@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1785938223";
+  var APP_VERSION="1785939329";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -1925,15 +1925,24 @@ function buildS2(){
   if(typeof renderRetratoExtra==='function' && !esSecundaria){
     html += renderRetratoExtra(school);
   }
-  // Total de packs elegidos
+  // Total de TODOS los productos (packs + extras)
   var _totalPacks=0;
   if(ST.sel.packs){ Object.keys(ST.sel.packs).forEach(function(pid){
     var pq=parseInt(ST.sel.packs[pid])||0; if(pq<=0) return;
     var pk=ST.products.find(function(p){return p.id===pid;});
     if(pk) _totalPacks += pk.price*pq;
   }); }
+  // Sumar los extras (retrato extra, etc.) con su descuento por cantidad
+  if(ST.sel.extras){ Object.keys(ST.sel.extras).forEach(function(pid){
+    var eq=parseInt(ST.sel.extras[pid])||0; if(eq<=0) return;
+    var ep=ST.products.find(function(p){return p.id===pid;});
+    if(!ep) return;
+    var descU=ST.cfg.discQty||3, descP=ST.cfg.discPct||25;
+    var precioU=(eq>=descU)?roundNice(ep.price*(1-descP/100)):ep.price;
+    _totalPacks += precioU*eq;
+  }); }
   if(hayPackElegido() && (!esSecundaria || ST.sel.opcionSec)){
-    html+='<div style="margin-top:14px;padding:14px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.3);border-radius:12px;text-align:center"><div style="font-size:12px;color:#94a3b8">Total en carpetas</div><div style="font-size:24px;font-weight:900;color:#34d399">'+fmt(_totalPacks)+'</div></div>';
+    html+='<div style="margin-top:14px;padding:14px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.3);border-radius:12px;text-align:center"><div style="font-size:12px;color:#94a3b8">Total productos</div><div style="font-size:24px;font-weight:900;color:#34d399">'+fmt(_totalPacks)+'</div></div>';
     html+='<button class="pay-btn" style="margin-top:12px;font-size:17px;padding:15px" onclick="ST.step=4;R()">Continuar al pago</button>';
   }
   html+='</div>';
