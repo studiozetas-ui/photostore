@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1785939329";
+  var APP_VERSION="1785941400";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -2102,18 +2102,11 @@ function buildS4(){
   // Botón pagar
   html+='<button class="pay-btn" onclick="doPagar()">💳 Pagar '+fmt(total)+'</button>';
 
-  // Archivos digitales próximamente
+  // Aviso sobre archivos digitales (breve) + botón de descarga
   html+='<div style="background:rgba(99,102,241,.06);border:1px dashed rgba(99,102,241,.25);border-radius:12px;padding:13px;margin-top:12px;text-align:center">';
-  html+='<div style="font-size:11px;color:#818cf8;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700">📥 Cómo vas a descargar tus fotos</div>';
-  html+='<div style="font-size:13px;color:#e2e8f0;line-height:1.7;text-align:left">';
-  html+='<div style="margin-bottom:8px"><span style="color:#34d399;font-weight:900">1.</span> Comprás ahora y enviás tu comprobante.</div>';
-  html+='<div style="margin-bottom:8px"><span style="color:#34d399;font-weight:900">2.</span> Cuando las fotos estén listas, <strong style="color:#a5b4fc">volvés a entrar a esta app con el mismo link</strong>.</div>';
-  html+='<div style="margin-bottom:8px"><span style="color:#34d399;font-weight:900">3.</span> Tocás <strong style="color:#fbbf24">"Descargar mis fotos"</strong>, elegís tu grado y tu nombre de la lista.</div>';
-  html+='<div><span style="color:#34d399;font-weight:900">4.</span> Si tu pago está confirmado, descargás tus fotos al celular. ✅</div>';
-  html+='</div>';
-  html+='<div style="margin-top:10px;padding:8px;background:rgba(129,140,248,.1);border-radius:8px;font-size:11px;color:#94a3b8;text-align:center">💡 Guardá este link o el QR para volver cuando estén las fotos.</div>';
-  html+='<button onclick="ST.view=\'descargar\';R()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,rgba(5,150,105,.25),rgba(4,120,87,.15));border:1.5px solid rgba(16,185,129,.6);color:#6ee7b7;border-radius:10px;padding:12px;font-size:13px;font-weight:800;cursor:pointer">📥 Ir a descargar mis fotos digitales</button>';
-  html+='</div>';
+  html+='<div style="font-size:12px;color:#94a3b8;line-height:1.6">📥 <strong style="color:#a5b4fc">¿Compraste los archivos digitales?</strong> Vas a poder descargarlos una vez que se entreguen las fotos en el colegio, entrando con tu nombre desde el botón de abajo.</div>';
+  html+='<button onclick="ST.view=\'descargar\';R()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,rgba(5,150,105,.25),rgba(4,120,87,.15));border:1.5px solid rgba(16,185,129,.6);color:#6ee7b7;border-radius:10px;padding:12px;font-size:13px;font-weight:800;cursor:pointer">📥 Descargar mis fotoarchivos digitales</button>';
+  html+='</div>' 
 
   
   html+='</div>';
@@ -5947,8 +5940,9 @@ function buildDescargar(){
   var html = '<div style="max-width:520px;margin:0 auto;padding:20px">';
   html += '<div style="text-align:center;margin-bottom:20px">'+logo+'</div>';
   html += '<div style="text-align:center;margin-bottom:8px"><span style="font-size:11px;letter-spacing:2px;color:#818cf8;text-transform:uppercase">Studio Zeta</span></div>';
-  html += '<h2 style="text-align:center;color:#fff;font-size:26px;margin-bottom:6px">📥 Descargá tus fotos</h2>';
-  html += '<p style="text-align:center;color:#94a3b8;font-size:14px;margin-bottom:24px">Elegí tu grado y tu nombre. Si tu pago está confirmado, vas a poder descargar tus fotos.</p>';
+  html += '<h2 style="text-align:center;color:#fff;font-size:24px;margin-bottom:6px">📥 Descargá tus fotoarchivos digitales</h2>';
+  html += '<div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.3);border-radius:12px;padding:13px;margin-bottom:20px;text-align:center"><div style="font-size:13px;color:#c7d2fe;line-height:1.6">Si compraste los archivos para descargar, estarán disponibles una vez que se entreguen las fotos en el colegio.</div></div>';
+  html += '<p style="text-align:center;color:#94a3b8;font-size:13px;margin-bottom:20px">Elegí tu grado y tu nombre de la lista.</p>';
 
   // Selector de colegio — si se entró con ?colegio= (colegioFiltro), fijar ese y NO mostrar selector
   if(ST.colegioFiltro){
@@ -6039,7 +6033,11 @@ function descSelAlumno(v){
   var grObj = descGetGrado(_descState.grado);
   var scObj = ST.schools.find(function(s){return s.id===_descState.colegio;});
 
-  // Buscar pedido pagado + verificado de este alumno
+  // ¿Hay algún pedido de este alumno (aunque no esté verificado)?
+  var algunPedido = ST.orders.find(function(o){
+    return (o.studentId===st.id || (o.studentName && o.studentName.toLowerCase()===st.name.toLowerCase()));
+  });
+  // Buscar pedido pagado + verificado
   var pedido = ST.orders.find(function(o){
     return o.status==='paid' &&
            (o.studentId===st.id || (o.studentName && o.studentName.toLowerCase()===st.name.toLowerCase())) &&
@@ -6047,11 +6045,21 @@ function descSelAlumno(v){
   });
 
   if(!pedido){
-    cont.innerHTML = '<div style="background:#1e293b;border:1px solid #f59e0b;border-radius:14px;padding:20px;text-align:center">'+
-      '<div style="font-size:36px;margin-bottom:10px">⏳</div>'+
-      '<div style="color:#fbbf24;font-weight:700;font-size:16px;margin-bottom:6px">Todavía no está habilitado</div>'+
-      '<div style="color:#94a3b8;font-size:14px">Tus fotos van a estar disponibles cuando confirmemos tu pago. Si ya pagaste, esperá la verificación.</div>'+
-      '</div>';
+    if(!algunPedido){
+      // No hay NINGÚN registro de compra de este alumno
+      cont.innerHTML = '<div style="background:#1e293b;border:1px solid #f87171;border-radius:14px;padding:20px;text-align:center">'+
+        '<div style="font-size:36px;margin-bottom:10px">🔍</div>'+
+        '<div style="color:#f87171;font-weight:700;font-size:16px;margin-bottom:6px">No hay registro de tu pago para este producto</div>'+
+        '<div style="color:#94a3b8;font-size:14px">No encontramos una compra de archivos digitales a tu nombre. Si creés que es un error, escribinos.</div>'+
+        '</div>';
+    } else {
+      // Hay pedido pero falta verificar el pago
+      cont.innerHTML = '<div style="background:#1e293b;border:1px solid #f59e0b;border-radius:14px;padding:20px;text-align:center">'+
+        '<div style="font-size:36px;margin-bottom:10px">⏳</div>'+
+        '<div style="color:#fbbf24;font-weight:700;font-size:16px;margin-bottom:6px">Estamos verificando tu pago</div>'+
+        '<div style="color:#94a3b8;font-size:14px">Ya tenemos tu compra registrada. En cuanto confirmemos el pago vas a poder descargar tus fotos.</div>'+
+        '</div>';
+    }
     return;
   }
 
