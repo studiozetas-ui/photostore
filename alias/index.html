@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1785941400";
+  var APP_VERSION="1785959498";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -759,7 +759,27 @@ function cargarAlumnos(gr, nombres){
 
 function importStudents(ev,sid,lid,gid){var file=ev.target.files[0];if(!file)return;var sc=ST.schools.find(function(s){return s.id===sid;});var lv=sc&&(sc.levels||[]).find(function(l){return l.id===lid;});var gr=lv&&(lv.grades||[]).find(function(g){return g.id===gid;});if(!gr)return;readFile(file,function(rows){var hdr=rows[0]||[];var hi=hdr.map(function(c){return String(c||'').toLowerCase();});var ni=hi.findIndex(function(h){return h.includes('nombre')||h.includes('alumno')||h.includes('apellido');});if(ni<0)ni=0;var start=1;var added=0;for(var i=start;i<rows.length;i++){var nm=String(rows[i][ni]||'').trim();if(nm&&nm.length>1){gr.students.push({id:uid(),name:nm});added++;}}saveData();alert('Importados '+added+' alumnos');R();});}
 function exportTemplate(){var all=[];ST.schools.forEach(function(sc){(sc.levels||[]).forEach(function(lv){(lv.grades||[]).forEach(function(gr){(gr.students||[]).forEach(function(st){var pm=ST.photoMap[st.id]||{};all.push([sc.name,lv.name,gr.name,st.name,pm.retrato||'',pm.maestra||'']);});});});});if(!all.length){alert('Sin alumnos.');return;}var wb=XLSX.utils.book_new();var data=[['COLEGIO','NIVEL','GRADO','ALUMNO','N_RETRATO','N_MAESTRA']].concat(all);var ws=XLSX.utils.aoa_to_sheet(data);ws['!cols']=[{wch:28},{wch:14},{wch:18},{wch:36},{wch:14},{wch:14}];XLSX.utils.book_append_sheet(wb,ws,'Alumnos');XLSX.writeFile(wb,'plantilla_fotos.xlsx');}
-function importPhotoNums(ev){var file=ev.target.files[0];if(!file)return;var all=[];ST.schools.forEach(function(sc){(sc.levels||[]).forEach(function(lv){(lv.grades||[]).forEach(function(gr){(gr.students||[]).forEach(function(st){all.push(st);});});});});readFile(file,function(rows){if(!rows.length)return;var hdr=rows[0].map(function(c){return String(c||'').toLowerCase();});var ni=hdr.findIndex(function(h){return h.includes('alumno')||h.includes('nombre');});var ri=hdr.findIndex(function(h){return h.includes('retrato');});var mi=hdr.findIndex(function(h){return h.includes('maestra')||h.includes('seno');});if(ni<0){alert('No encontre columna de nombres.');return;}var n=0;for(var i=1;i<rows.length;i++){var nombre=String(rows[i][ni]||'').trim().toLowerCase();if(!nombre)continue;var st=all.find(function(a){return a.name.toLowerCase().includes(nombre)||nombre.includes(a.name.toLowerCase());});if(!st)continue;var pm=ST.photoMap[st.id]||{};if(ri>=0&&rows[i][ri])pm.retrato=String(rows[i][ri]).trim().replace(/\D/g,'');if(mi>=0&&rows[i][mi])pm.maestra=String(rows[i][mi]).trim().replace(/\D/g,'');ST.photoMap[st.id]=pm;n++;}saveData();alert('Actualizados '+n+' registros.');R();});}
+function importPhotoNums(ev){var file=ev.target.files[0];if(!file)return;var all=[];ST.schools.forEach(function(sc){(sc.levels||[]).forEach(function(lv){(lv.grades||[]).forEach(function(gr){(gr.students||[]).forEach(function(st){all.push(st);});});});});readFile(file,function(rows){if(!rows.length)return;var hdr=rows[0].map(function(c){return String(c||'').toLowerCase();});var ni=hdr.findIndex(function(h){return h.includes('alumno')||h.includes('nombre');});
+// Buscar TODAS las columnas de retrato y de con seño (para los 3 casilleros)
+var colsRet=[];var colsMae=[];
+hdr.forEach(function(h,idx){
+  if(h.indexOf('retrato')>=0) colsRet.push(idx);
+  if(h.indexOf('maestra')>=0||h.indexOf('seno')>=0||h.indexOf('seño')>=0) colsMae.push(idx);
+});
+// Fallback: si no hay múltiples, usar el viejo findIndex
+if(!colsRet.length){var _r=hdr.findIndex(function(h){return h.includes('retrato');});if(_r>=0)colsRet.push(_r);}
+if(!colsMae.length){var _m=hdr.findIndex(function(h){return h.includes('maestra')||h.includes('seno');});if(_m>=0)colsMae.push(_m);}
+if(ni<0){alert('No encontre columna de nombres.');return;}
+// Toma el ÚLTIMO casillero con número de una lista de columnas
+function ultimoNum(row,cols){
+  var val='';
+  cols.forEach(function(ci){
+    var v=String(row[ci]||'').trim().replace(/\D/g,'');
+    if(v) val=v; // el último no vacío gana
+  });
+  return val;
+}
+var n=0;for(var i=1;i<rows.length;i++){var nombre=String(rows[i][ni]||'').trim().toLowerCase();if(!nombre)continue;var st=all.find(function(a){return a.name.toLowerCase().includes(nombre)||nombre.includes(a.name.toLowerCase());});if(!st)continue;var pm=ST.photoMap[st.id]||{};var vr=ultimoNum(rows[i],colsRet);var vm=ultimoNum(rows[i],colsMae);if(vr)pm.retrato=vr;if(vm)pm.maestra=vm;ST.photoMap[st.id]=pm;n++;}saveData();alert('Actualizados '+n+' registros.');R();});}
 
 // ─── PRODUCTOS ───
 function buildProducts(){
@@ -5493,12 +5513,12 @@ function buildHojaGrado(g){
   if(esSec){
     rows.push(['N','APELLIDO Y NOMBRE','RETRATO','FOTO A','FOTO B','A','OBSERVACIONES']);
   } else {
-    rows.push(['N','APELLIDO Y NOMBRE','RETRATO','CON SEÑO','A','OBSERVACIONES','']);
+    rows.push(['N','APELLIDO Y NOMBRE','RETRATO','RETRATO','CON SEÑO','CON SEÑO','A','A','OBSERVACIONES']);
   }
   (g.gr.students||[]).forEach(function(st,i){
     var pm=ST.photoMap[st.id]||{};
     if(esSec) rows.push([i+1,st.name,pm.retrato||'',pm.fotoA||'',pm.fotoB||'','','']);
-    else rows.push([i+1,st.name,pm.retrato||'',pm.maestra||'','','','']);
+    else rows.push([i+1,st.name,pm.retrato||'','',pm.maestra||'','','','','']);
   });
   // 2 renglones vacíos para alumnos nuevos (sin número de orden)
   rows.push(['','','','','','','']);
@@ -5510,15 +5530,16 @@ function buildHojaGrado(g){
   rows.push(['','','','','','','']);
 
   var ws=XLSX.utils.aoa_to_sheet(rows);
-  var nRows=rows.length, nCols=7;
+  var nRows=rows.length, nCols=esSec?7:9;
   var DATA_START=4, DATA_END=DATA_START+nAl-1;
 
   var S_HDR={font:{bold:true,color:{rgb:'FFFFFF'},sz:12},fill:{fgColor:{rgb:'1E3A5F'}},alignment:{horizontal:'center',vertical:'center'},border:{top:{style:'medium'},bottom:{style:'medium'},left:{style:'medium'},right:{style:'medium'}},protection:{locked:true}};
   var S_TIT={font:{bold:true,sz:22,color:{rgb:'1E3A5F'}},fill:{fgColor:{rgb:'DBEAFE'}},alignment:{horizontal:'center'},protection:{locked:true}};
   var S_N={font:{color:{rgb:'64748B'},sz:10},fill:{fgColor:{rgb:'F1F5F9'}},alignment:{horizontal:'center'},border:{top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}},protection:{locked:true}};
-  var S_NOM={font:{bold:true,sz:12},border:{top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}},protection:{locked:true}};
+  var S_NOM={font:{bold:true,sz:11},alignment:{wrapText:true,vertical:'center'},border:{top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}},protection:{locked:true}};
   var S_EDIT={fill:{fgColor:{rgb:'FFFFF0'}},border:{top:{style:'medium'},bottom:{style:'medium'},left:{style:'medium'},right:{style:'medium'}},alignment:{horizontal:'center',vertical:'center'},font:{sz:16,bold:true},protection:{locked:false}};
   var S_OBS={fill:{fgColor:{rgb:'FFFFF0'}},border:{top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}},protection:{locked:false}};
+  var S_EDIT2={fill:{fgColor:{rgb:'DCFCE7'}},border:{top:{style:'medium'},bottom:{style:'medium'},left:{style:'medium'},right:{style:'medium'}},alignment:{horizontal:'center',vertical:'center'},font:{sz:16,bold:true},protection:{locked:false}};
   var S_LBL={font:{bold:true,sz:18,color:{rgb:'1E3A5F'}},fill:{fgColor:{rgb:'EFF6FF'}},protection:{locked:true}};
 
   function ca(r,cc){return XLSX.utils.encode_cell({r:r,c:cc});}
@@ -5534,14 +5555,14 @@ function buildHojaGrado(g){
     setS(rr,0,S_N);
     setS(rr,1, esFilaNueva?S_OBS:S_NOM); // nombre cremita en filas nuevas
     if(esSec){setS(rr,2,S_EDIT);setS(rr,3,S_EDIT);setS(rr,4,S_EDIT);setS(rr,5,S_EDIT);setS(rr,6,S_OBS);}
-    else{setS(rr,2,S_EDIT);setS(rr,3,S_EDIT);setS(rr,4,S_EDIT);setS(rr,5,S_OBS);setS(rr,6,S_OBS);}
+    else{setS(rr,2,S_EDIT2);setS(rr,3,S_EDIT);setS(rr,4,S_EDIT2);setS(rr,5,S_EDIT);setS(rr,6,S_EDIT2);setS(rr,7,S_EDIT);setS(rr,8,S_OBS);}
   }
   for(var rr=DATA_END+1;rr<nRows;rr++){
     for(var cc=0;cc<nCols;cc++) setS(rr,cc,rr===DATA_END+2?S_LBL:S_OBS);
   }
 
   if(esSec) ws['!cols']=[{wch:4},{wch:32},{wch:12},{wch:12},{wch:12},{wch:5},{wch:52}];
-  else ws['!cols']=[{wch:4},{wch:32},{wch:12},{wch:12},{wch:5},{wch:56},{wch:1}];
+  else ws['!cols']=[{wch:4},{wch:36},{wch:13},{wch:13},{wch:13},{wch:13},{wch:6},{wch:6},{wch:16}];
   ws['!rows']=[];
   // Altura dinámica: llena la hoja según cantidad de alumnos
   var nFilasDatos=nAl+2; // +2 renglones vacíos
@@ -6033,10 +6054,6 @@ function descSelAlumno(v){
   var grObj = descGetGrado(_descState.grado);
   var scObj = ST.schools.find(function(s){return s.id===_descState.colegio;});
 
-  // ¿Hay algún pedido de este alumno (aunque no esté verificado)?
-  var algunPedido = ST.orders.find(function(o){
-    return (o.studentId===st.id || (o.studentName && o.studentName.toLowerCase()===st.name.toLowerCase()));
-  });
   // Buscar pedido pagado + verificado
   var pedido = ST.orders.find(function(o){
     return o.status==='paid' &&
@@ -6045,26 +6062,54 @@ function descSelAlumno(v){
   });
 
   if(!pedido){
-    if(!algunPedido){
-      // No hay NINGÚN registro de compra de este alumno
-      cont.innerHTML = '<div style="background:#1e293b;border:1px solid #f87171;border-radius:14px;padding:20px;text-align:center">'+
-        '<div style="font-size:36px;margin-bottom:10px">🔍</div>'+
-        '<div style="color:#f87171;font-weight:700;font-size:16px;margin-bottom:6px">No hay registro de tu pago para este producto</div>'+
-        '<div style="color:#94a3b8;font-size:14px">No encontramos una compra de archivos digitales a tu nombre. Si creés que es un error, escribinos.</div>'+
-        '</div>';
-    } else {
-      // Hay pedido pero falta verificar el pago
-      cont.innerHTML = '<div style="background:#1e293b;border:1px solid #f59e0b;border-radius:14px;padding:20px;text-align:center">'+
-        '<div style="font-size:36px;margin-bottom:10px">⏳</div>'+
-        '<div style="color:#fbbf24;font-weight:700;font-size:16px;margin-bottom:6px">Estamos verificando tu pago</div>'+
-        '<div style="color:#94a3b8;font-size:14px">Ya tenemos tu compra registrada. En cuanto confirmemos el pago vas a poder descargar tus fotos.</div>'+
-        '</div>';
-    }
+    // No hay pago verificado de los archivos digitales de este alumno
+    cont.innerHTML = '<div style="background:#1e293b;border:1px solid #f87171;border-radius:14px;padding:20px;text-align:center">'+
+      '<div style="font-size:36px;margin-bottom:10px">🔍</div>'+
+      '<div style="color:#f87171;font-weight:700;font-size:16px;margin-bottom:6px">No hay registro de tu pago para este producto</div>'+
+      '<div style="color:#94a3b8;font-size:14px">No encontramos un pago confirmado de los archivos digitales a tu nombre. Si ya pagaste, escribinos para verificarlo.</div>'+
+      '</div>';
     return;
   }
 
-  // Está habilitado: mostrar sus fotos
-  descMostrarFotos(st, grObj, scObj, cont);
+  // Pago OK. Ahora verificar en el Drive si las fotos ya están subidas.
+  var fotosUrl = (ST.cfg.fotosUrl||'').trim();
+  var pm = (ST.photoMap && ST.photoMap[st.id]) || {};
+  var prefijo = (ST.cfg.photoPrefix||'').trim();
+  // Armar el número de la PRIMERA foto para chequear (retrato, o grupal si no hay retrato)
+  var numChequeo = '';
+  if(pm.retrato) numChequeo = prefijo + pm.retrato;
+  else if(pm.maestra) numChequeo = prefijo + pm.maestra;
+  else if(grObj) numChequeo = (grObj.numGrupal && grObj.numGrupal.trim()) ? grObj.numGrupal.trim() : (grObj.name + '_GRUPAL');
+
+  if(!fotosUrl || !numChequeo){
+    // Sin config o sin número: mostrar directo (fallback al comportamiento anterior)
+    descMostrarFotos(st, grObj, scObj, cont);
+    return;
+  }
+
+  // Mostrar "cargando" mientras consulta el Drive
+  cont.innerHTML = '<div style="background:#1e293b;border:1px solid #334155;border-radius:14px;padding:20px;text-align:center"><div style="font-size:28px;margin-bottom:8px">⏳</div><div style="color:#94a3b8;font-size:14px">Verificando si tus fotos están listas...</div></div>';
+
+  var gradoNom = (grObj && grObj.name) ? grObj.name : '';
+  fetch(fotosUrl + '?action=getFoto&num=' + encodeURIComponent(numChequeo) + '&grado=' + encodeURIComponent(gradoNom))
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if(res.ok && res.encontrada){
+        // Las fotos ESTÁN subidas: mostrar descarga
+        descMostrarFotos(st, grObj, scObj, cont);
+      } else {
+        // Pagó pero las fotos AÚN no están subidas
+        cont.innerHTML = '<div style="background:#1e293b;border:1px solid #f59e0b;border-radius:14px;padding:20px;text-align:center">'+
+          '<div style="font-size:36px;margin-bottom:10px">📸</div>'+
+          '<div style="color:#fbbf24;font-weight:700;font-size:16px;margin-bottom:6px">Aún las fotos no están listas</div>'+
+          '<div style="color:#94a3b8;font-size:14px">Las vas a poder descargar cuando se entreguen las fotos en papel en el colegio. Volvé a entrar más adelante.</div>'+
+          '</div>';
+      }
+    })
+    .catch(function(){
+      // Si falla la consulta, intentar mostrar igual (no bloquear)
+      descMostrarFotos(st, grObj, scObj, cont);
+    });
 }
 
 function descGetAlumno(alumnoId){
