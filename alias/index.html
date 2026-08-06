@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1785959498";
+  var APP_VERSION="1786031906";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -342,7 +342,7 @@ function buildLanding(){
   }
   if(esAdmin){html+='<button onclick="irAdmin()" style="width:100%;margin-top:10px;background:none;border:1px solid #1e293b;color:#334155;border-radius:10px;padding:10px;font-size:12px;cursor:pointer">⚙️ Admin</button>';}
   // Botón para descargar fotos (los que ya compraron)
-  html+='<button onclick="ST.view=\'descargar\';R()" style="width:100%;margin-top:14px;background:linear-gradient(135deg,rgba(5,150,105,.2),rgba(4,120,87,.12));border:1.5px solid rgba(16,185,129,.5);color:#6ee7b7;border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer">📥 ¿Ya compraste? Descargá tus fotos</button>';
+  html+='<button onclick="ST.view=\'descargar\';R()" style="width:100%;margin-top:14px;background:linear-gradient(135deg,rgba(5,150,105,.2),rgba(4,120,87,.12));border:1.5px solid rgba(16,185,129,.5);color:#6ee7b7;border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer">📥 ¿Compraste las digitales? Descargar acá</button>';
   html+='<div style="text-align:center;margin-top:14px;font-size:10px;color:#1e293b">Studio Zeta · Fotografía & Video</div>';
   
   html+='</div></div>';
@@ -438,7 +438,7 @@ function uploadCamIcon(ev){var f=ev.target.files[0];if(!f)return;var r=new FileR
 function buildSchools(){
   var html='<div class="ph"><span class="pt">🏫 Colegios</span><div style="display:flex;gap:6px">';
   html+='<button class="btn btn-A btn-sm" onclick="exportTemplate()">📥 Plantilla</button>';
-  html+='<label class="btn btn-S btn-sm" style="cursor:pointer">📤 Importar N°<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="importPhotoNums(event)"></label>';
+  html+='<label class="btn btn-S btn-sm" style="cursor:pointer">📤 Importar N°<input type="file" accept=".xlsx,.xls,.csv,.jpg,.jpeg,.png,.webp,image/*" style="display:none" onchange="importPhotoNums(event)"></label>';
   html+='<button class="btn btn-I btn-sm" onclick="addSchool()">+ Colegio</button>';
   html+='</div></div>';
   // Aviso si no hay API key para leer JPG
@@ -491,7 +491,7 @@ function buildSchools(){
             html+='<span style="font-size:10px;background:'+(tipo==='solo_retrato'?'rgba(245,158,11,.2)':'rgba(99,102,241,.2)')+';color:'+(tipo==='solo_retrato'?'#fbbf24':'#a5b4fc')+';border-radius:20px;padding:2px 8px;margin-left:4px">'+(tipo==='solo_retrato'?'Solo Retrato':'Retrato + Maestra')+'</span>';
             html+='<span style="font-size:11px;color:#64748b;margin-left:4px">'+(openGr?'▲':'▼')+'</span></button>';
             html+='<div style="display:flex;gap:4px">';
-            html+='<label class="btn btn-A btn-xs" style="cursor:pointer">📋 Lista<input type="file" accept=".xlsx,.xls,.csv,image/*" style="display:none" onchange="normalizarYCargar(event,'+si+','+li+','+gi+')"></label>';
+            html+='<label class="btn btn-A btn-xs" style="cursor:pointer">📋 Lista<input type="file" accept=".xlsx,.xls,.csv,.jpg,.jpeg,.png,.webp,image/*" style="display:none" onchange="normalizarYCargar(event,'+si+','+li+','+gi+')"></label>';
             html+='<button class="btn btn-S btn-xs" onclick="grAddSt('+si+','+li+','+gi+')">+ Alumno</button>';
             html+='<button class="btn btn-A btn-xs" onclick="grTipo('+si+','+li+','+gi+')" title="Cambiar formato">'+(gr.tipo==='solo_retrato'?'🟡 Solo R':'🟣 R+M')+'</button>';
             html+='<button class="btn-danger" onclick="grDel('+si+','+li+','+gi+')">🗑️</button>';
@@ -759,7 +759,116 @@ function cargarAlumnos(gr, nombres){
 
 function importStudents(ev,sid,lid,gid){var file=ev.target.files[0];if(!file)return;var sc=ST.schools.find(function(s){return s.id===sid;});var lv=sc&&(sc.levels||[]).find(function(l){return l.id===lid;});var gr=lv&&(lv.grades||[]).find(function(g){return g.id===gid;});if(!gr)return;readFile(file,function(rows){var hdr=rows[0]||[];var hi=hdr.map(function(c){return String(c||'').toLowerCase();});var ni=hi.findIndex(function(h){return h.includes('nombre')||h.includes('alumno')||h.includes('apellido');});if(ni<0)ni=0;var start=1;var added=0;for(var i=start;i<rows.length;i++){var nm=String(rows[i][ni]||'').trim();if(nm&&nm.length>1){gr.students.push({id:uid(),name:nm});added++;}}saveData();alert('Importados '+added+' alumnos');R();});}
 function exportTemplate(){var all=[];ST.schools.forEach(function(sc){(sc.levels||[]).forEach(function(lv){(lv.grades||[]).forEach(function(gr){(gr.students||[]).forEach(function(st){var pm=ST.photoMap[st.id]||{};all.push([sc.name,lv.name,gr.name,st.name,pm.retrato||'',pm.maestra||'']);});});});});if(!all.length){alert('Sin alumnos.');return;}var wb=XLSX.utils.book_new();var data=[['COLEGIO','NIVEL','GRADO','ALUMNO','N_RETRATO','N_MAESTRA']].concat(all);var ws=XLSX.utils.aoa_to_sheet(data);ws['!cols']=[{wch:28},{wch:14},{wch:18},{wch:36},{wch:14},{wch:14}];XLSX.utils.book_append_sheet(wb,ws,'Alumnos');XLSX.writeFile(wb,'plantilla_fotos.xlsx');}
-function importPhotoNums(ev){var file=ev.target.files[0];if(!file)return;var all=[];ST.schools.forEach(function(sc){(sc.levels||[]).forEach(function(lv){(lv.grades||[]).forEach(function(gr){(gr.students||[]).forEach(function(st){all.push(st);});});});});readFile(file,function(rows){if(!rows.length)return;var hdr=rows[0].map(function(c){return String(c||'').toLowerCase();});var ni=hdr.findIndex(function(h){return h.includes('alumno')||h.includes('nombre');});
+function leerPlanillaIA(file, inputEl, ctx){
+  var key=(ST.cfg.claudeKey||'').trim();
+  if(!key){
+    alert('Para leer la planilla escaneada con IA necesitás configurar tu API Key de Claude en Configuración.\n\nMientras tanto, podés cargar los números por Excel.');
+    if(inputEl) inputEl.value='';
+    return;
+  }
+  // Aviso de progreso
+  var prevAlert = document.createElement('div');
+  prevAlert.id='ia-progress';
+  prevAlert.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;padding:20px;text-align:center';
+  prevAlert.innerHTML='<div style="font-size:40px;margin-bottom:14px">🤖</div><div style="font-size:18px;font-weight:700;margin-bottom:8px">Leyendo la planilla...</div><div style="font-size:14px;color:#94a3b8;max-width:320px">La IA está interpretando los números manuscritos. Esto puede tardar unos segundos.</div>';
+  document.body.appendChild(prevAlert);
+
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var b64=e.target.result.split(',')[1];
+    var mt=file.type||'image/jpeg';
+    var hdrs={'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true','x-api-key':key};
+    var prompt='Esta es una planilla escolar de fotos completada a mano. Cada fila tiene el NOMBRE de un alumno y numeros de foto escritos a mano en casilleros. Hay 2 casilleros para RETRATO y 2 para CON SEÑO (el segundo casillero de cada par es por si el primero esta tachado/corregido). Tambien puede haber una A de ausente.\n\nREGLAS:\n- Para cada alumno devolve el numero de RETRATO y el de CON SEÑO.\n- Si un casillero esta tachado, usa el otro (la correccion). Si hay 2 llenos, usa el ULTIMO que no este tachado.\n- Si un numero no se lee bien pero los alumnos de arriba y abajo son consecutivos (ej 3427, ?, 3429), deduci el del medio (3428) y marcalo como dudoso.\n- Si el alumno tiene A (ausente) y sin numeros, deja los numeros vacios.\n- Los numeros suelen ser de 3 a 5 digitos.\n- IGNORA cualquier texto o anotacion escrito en la columna OBSERVACIONES o fuera de los casilleros de numeros; NO lo interpretes como numero de foto.\n- Devolve el NOMBRE tal como aparece en la planilla, lo mas fiel posible (respeta apellidos y nombres completos).\n\nDevolve SOLO un JSON valido (sin texto extra, sin markdown) con este formato exacto:\n{"alumnos":[{"nombre":"APELLIDO NOMBRE","retrato":"3427","conSeno":"3430","dudoso":false},...]}\nSi un dato es dudoso o deducido, poné "dudoso":true en ese alumno.';
+
+    fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:hdrs,
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:4000,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mt,data:b64}},
+          {type:'text',text:prompt}
+        ]}]
+      })
+    })
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var prog=document.getElementById('ia-progress'); if(prog) prog.remove();
+      if(inputEl) inputEl.value='';
+      if(data.error){alert('Error de la IA: '+data.error.message);return;}
+      if(!data.content||!data.content[0]||!data.content[0].text){alert('La IA no devolvió respuesta. Probá con una foto más nítida.');return;}
+      var txt=data.content[0].text.replace(/```json|```/g,'').trim();
+      var parsed;
+      try{ parsed=JSON.parse(txt); }catch(err){ alert('No pude interpretar la respuesta de la IA. Probá con una foto más clara o cargá por Excel.'); return; }
+      if(!parsed.alumnos||!parsed.alumnos.length){alert('La IA no encontró alumnos en la planilla.');return;}
+      // Generar un Excel para que Marcelo REVISE antes de cargar
+      generarExcelDesdeIA(parsed.alumnos, ctx);
+    })
+    .catch(function(err){
+      var prog=document.getElementById('ia-progress'); if(prog) prog.remove();
+      if(inputEl) inputEl.value='';
+      alert('Error al conectar con la IA. Verificá tu internet y tu API Key.');
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function generarExcelDesdeIA(alumnos, ctx){
+  // Si hay contexto del grado, armar la PLANILLA COMPLETA (misma que buildHojaGrado) con los números de la IA
+  if(ctx && ctx.students && ctx.students.length){
+    // Normalizador de nombres para el match IA <-> alumnos reales
+    function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ').trim(); }
+    // Guardar photoMap actual para restaurar después (no tocar el real)
+    var _bak={};
+    ctx.students.forEach(function(st){ _bak[st.id]=ST.photoMap[st.id]; });
+    // Volcar lo que leyó la IA al photoMap temporal, matcheando por nombre
+    var dudosos={};
+    ctx.students.forEach(function(st){
+      var nSt=norm(st.name);
+      var found=null;
+      alumnos.forEach(function(a){
+        var nA=norm(a.nombre);
+        if(!found && (nA===nSt || nA.indexOf(nSt)>=0 || nSt.indexOf(nA)>=0)) found=a;
+      });
+      if(found){
+        ST.photoMap[st.id]={retrato:found.retrato||'', maestra:found.conSeno||''};
+        if(found.dudoso) dudosos[st.id]=true;
+      } else {
+        ST.photoMap[st.id]={retrato:'', maestra:''};
+      }
+    });
+    // Armar la planilla con buildHojaGrado (misma que la vacía)
+    var gObj={ sc:{name:ctx.colName}, lv:{name:ctx.levelName||'PRIMARIA'}, gr:{ name:ctx.gradeName, students:ctx.students } };
+    var ws=buildHojaGrado(gObj);
+    // Restaurar photoMap real
+    ctx.students.forEach(function(st){ if(_bak[st.id]===undefined) delete ST.photoMap[st.id]; else ST.photoMap[st.id]=_bak[st.id]; });
+    var wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, (ctx.gradeName||'Grado').slice(0,31));
+    var fname = ctx.fname || ('FOTOS_'+(ctx.gradeName||'').replace(/[^A-Z0-9]/gi,'_')+'_LECTURA.xlsx');
+    XLSX.writeFile(wb, fname);
+    var nDud=Object.keys(dudosos).length;
+    alert('✅ Listo. Te descargué la planilla con los números que leyó la IA:\n\n'+fname+'\n\n1. Abrila y REVISÁ los números (mirá bien los que puedan estar dudosos'+(nDud?' — la IA marcó '+nDud+' como dudosos':'')+').\n2. Corregí lo que haga falta directo en la planilla.\n3. Volvé a este mismo grado en ADN Fotos y usá Reimportar para subir ESA planilla corregida.');
+    return;
+  }
+  // Fallback (sin contexto): Excel simple
+  var rows=[['N','APELLIDO Y NOMBRE','RETRATO','CON SEÑO','REVISAR']];
+  alumnos.forEach(function(a,i){
+    rows.push([ i+1, a.nombre||'', a.retrato||'', a.conSeno||'', a.dudoso?'⚠️ Revisar':'' ]);
+  });
+  var ws2=XLSX.utils.aoa_to_sheet(rows);
+  ws2['!cols']=[{wch:5},{wch:38},{wch:12},{wch:12},{wch:14}];
+  var wb2=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb2,ws2,'Revisar');
+  XLSX.writeFile(wb2,'REVISAR_numeros_IA_'+Date.now()+'.xlsx');
+  alert('✅ Listo. Te descargué un Excel con los números que leyó la IA. Revisalo, corregí y volvé a subirlo en Reimportar.');
+}
+
+function importPhotoNums(ev){var file=ev.target.files[0];if(!file)return;
+  // Si es una IMAGEN (planilla escaneada), leerla con IA en vez de Excel
+  var esImagen = /^image\//.test(file.type) || /\.(jpe?g|png|webp)$/i.test(file.name);
+  if(esImagen){ leerPlanillaIA(file, ev.target); return; }
+  var all=[];ST.schools.forEach(function(sc){(sc.levels||[]).forEach(function(lv){(lv.grades||[]).forEach(function(gr){(gr.students||[]).forEach(function(st){all.push(st);});});});});readFile(file,function(rows){if(!rows.length)return;var hdr=rows[0].map(function(c){return String(c||'').toLowerCase();});var ni=hdr.findIndex(function(h){return h.includes('alumno')||h.includes('nombre');});
 // Buscar TODAS las columnas de retrato y de con seño (para los 3 casilleros)
 var colsRet=[];var colsMae=[];
 hdr.forEach(function(h,idx){
@@ -881,7 +990,7 @@ function buildADN(){
   var totalSt = 0, totalMapped = 0;
   grados.forEach(function(g){ totalSt += g.gr.students.length; totalMapped += g.mapped; });
 
-  var html = '<div class="ph"><span class="pt">🧬 ADN Fotos</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button onclick="exportarColegioDesdeADN()" style="background:#1d4ed8;color:#fff;border:none;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer">⬇ Todo colegio</button><button onclick="exportarNivel()" style="background:#059669;color:#fff;border:none;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer">⬇ Por nivel</button><label style="background:#7c3aed;color:#fff;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;display:inline-block">⬆ Reimportar global<input type="file" accept=".xlsx,.xls,.csv" multiple style="display:none" onchange="reimportarGlobal(event)"></label><label style="background:#6d28d9;color:#fff;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;display:inline-block">⬆ Reimportar nivel<input type="file" accept=".xlsx,.xls,.csv" multiple style="display:none" onchange="reimportarNivel(event)"></label></div></div>';
+  var html = '<div class="ph"><span class="pt">🧬 ADN Fotos</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button onclick="exportarColegioDesdeADN()" style="background:#1d4ed8;color:#fff;border:none;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer">⬇ Todo colegio</button><button onclick="exportarNivel()" style="background:#059669;color:#fff;border:none;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer">⬇ Por nivel</button><label style="background:#7c3aed;color:#fff;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;display:inline-block">⬆ Reimportar global<input type="file" accept=".xlsx,.xls,.csv,.jpg,.jpeg,.png,.webp,image/*" multiple style="display:none" onchange="reimportarGlobal(event)"></label><label style="background:#6d28d9;color:#fff;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;display:inline-block">⬆ Reimportar nivel<input type="file" accept=".xlsx,.xls,.csv,.jpg,.jpeg,.png,.webp,image/*,application/pdf,.pdf" multiple style="display:none" onchange="reimportarNivel(event)"></label></div></div>';
 
   html += '<div class="alert-b" style="margin-bottom:14px">';
   html += '<strong>Flujo de trabajo:</strong><br>';
@@ -926,7 +1035,7 @@ function buildADN(){
     html += '<div style="display:flex;align-items:center;gap:10px">';
     html += '<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:'+color+'">' + g.mapped + '/' + g.gr.students.length + '</div><div style="font-size:9px;color:#64748b">con fotos</div></div>';
     html += '<button class="btn btn-G btn-sm" onclick="exportarGrado('+gi_global+')">⬇ Exportar Excel</button>';
-    html += '<label class="btn btn-I btn-sm" style="cursor:pointer">⬆ Reimportar<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="reimportarGrado(event,'+gi_global+')"></label>';
+    html += '<label class="btn btn-I btn-sm" style="cursor:pointer">⬆ Reimportar<input type="file" accept=".xlsx,.xls,.csv,.jpg,.jpeg,.png,.webp,image/*,application/pdf,.pdf" style="display:none" onchange="reimportarGrado(event,'+gi_global+')"></label>';
     html += '<button class="btn btn-sm" style="background:#f59e0b;color:#000;font-weight:700" onclick="pruebaGrado('+gi_global+')">🧪 Prueba</button>';
     html += '</div></div>';
 
@@ -1104,31 +1213,37 @@ function addCashOrder(){
     lista.innerHTML='';
     if(isNaN(idx)||!window._cashOpts[idx]) return;
     var op=window._cashOpts[idx];
-    var base=ST.products.find(function(p){return p.isBase;});
-    var school3=ST.schools.find(function(s){return s.id===ST.sel.school;});
-  var extras=ST.products.filter(function(p){
-    if(p.isBase) return false;
-    if(school3&&school3.productosExtra&&school3.productosExtra.length){
-      return school3.productosExtra.indexOf(p.id)>=0;
-    }
-    return true; // sin restricción = todos
-  });
+    var _scCash=ST.schools.find(function(s){return s.id===op.sc;});
+    // TODOS los productos base del colegio (no solo el primero)
+    var bases=ST.products.filter(function(p){
+      if(!p.isBase) return false;
+      if(_scCash&&_scCash.productosBase&&_scCash.productosBase.length){ return _scCash.productosBase.indexOf(p.id)>=0; }
+      return true;
+    });
+    var extras=ST.products.filter(function(p){
+      if(p.isBase) return false;
+      if(_scCash&&_scCash.productosExtra&&_scCash.productosExtra.length){ return _scCash.productosExtra.indexOf(p.id)>=0; }
+      return true;
+    });
     op.students.forEach(function(st,i){
       var row=document.createElement('div');
-      row.style.cssText='background:#0f172a;border-radius:8px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap';
+      row.style.cssText='background:#0f172a;border-radius:8px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap';
+      // Un control por cada producto base (carpetas, digitales, etc)
+      var basesHtml=bases.map(function(bp,bi){
+        return '<div style="display:flex;align-items:center;gap:3px">'
+          +'<span style="font-size:10px;color:#94a3b8">'+esc(bp.name)+':</span>'
+          +'<input type="number" min="0" max="20" value="0" data-base="'+bi+'" data-st="'+i+'" style="width:36px;background:#1e293b;border:1px solid #334155;border-radius:4px;padding:3px;color:#fff;font-size:12px;text-align:center">'
+          +'</div>';
+      }).join('');
       var extrasHtml=extras.map(function(ex,ei){
         return '<div style="display:flex;align-items:center;gap:3px">'
-          +'<span style="font-size:10px;color:#64748b">+Ext:</span>'
+          +'<span style="font-size:10px;color:#64748b">'+esc(ex.name)+':</span>'
           +'<input type="number" min="0" max="20" value="0" data-ext="'+ei+'" data-st="'+i+'" style="width:36px;background:#1e293b;border:1px solid #334155;border-radius:4px;padding:3px;color:#fff;font-size:11px;text-align:center">'
           +'</div>';
       }).join('');
-      row.innerHTML='<input type="checkbox" data-st="'+i+'" style="width:16px;height:16px;cursor:pointer;accent-color:#6366f1">'
-        +'<span style="flex:1;font-size:13px;color:#fff;font-weight:600">'+esc(st.name)+'</span>'
-        +'<div style="display:flex;align-items:center;gap:4px">'
-        +'<span style="font-size:10px;color:#64748b">Carpetas:</span>'
-        +'<input type="number" min="1" max="20" value="1" data-qty="'+i+'" style="width:36px;background:#1e293b;border:1px solid #334155;border-radius:4px;padding:3px;color:#fff;font-size:12px;text-align:center">'
-        +'</div>'
-        +extrasHtml;
+      row.innerHTML='<input type="checkbox" data-st="'+i+'" style="width:16px;height:16px;cursor:pointer;accent-color:#6366f1;margin-top:3px">'
+        +'<span style="flex:1;min-width:120px;font-size:13px;color:#fff;font-weight:600">'+esc(st.name)+'</span>'
+        +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+basesHtml+extrasHtml+'</div>';
       lista.appendChild(row);
     });
   });
@@ -1142,33 +1257,41 @@ function confirmarEfectivo(){
   var lv=sc&&(sc.levels||[]).find(function(l){return l.id===op.lv;});
   var gr=lv&&(lv.grades||[]).find(function(g){return g.id===op.gr;});
   if(!gr){alert('Error.');return;}
-  var base=ST.products.find(function(p){return p.isBase;});
-  var school3=ST.schools.find(function(s){return s.id===ST.sel.school;});
+  var _scCash=ST.schools.find(function(s){return s.id===op.sc;});
+  var bases=ST.products.filter(function(p){
+    if(!p.isBase) return false;
+    if(_scCash&&_scCash.productosBase&&_scCash.productosBase.length){ return _scCash.productosBase.indexOf(p.id)>=0; }
+    return true;
+  });
   var extras=ST.products.filter(function(p){
     if(p.isBase) return false;
-    if(school3&&school3.productosExtra&&school3.productosExtra.length){
-      return school3.productosExtra.indexOf(p.id)>=0;
-    }
-    return true; // sin restricción = todos
+    if(_scCash&&_scCash.productosExtra&&_scCash.productosExtra.length){ return _scCash.productosExtra.indexOf(p.id)>=0; }
+    return true;
   });
   var lista=document.getElementById('em_lista');
   var checks=lista.querySelectorAll('input[type=checkbox]:checked');
   if(!checks.length){alert('Marca al menos un alumno.');return;}
-  var registrados=0;
+  var registrados=0, sinProducto=0;
   checks.forEach(function(chk){
     var i=parseInt(chk.getAttribute('data-st'));
     var st=gr.students[i]; if(!st) return;
-    var qty=parseInt((lista.querySelector('input[data-qty="'+i+'"]')||{}).value)||1;
     var items=[];
-    if(base) items.push({name:base.name,qty:qty,price:base.price});
+    // Leer la cantidad de cada producto BASE
+    bases.forEach(function(bp,bi){
+      var bq=parseInt((lista.querySelector('input[data-base="'+bi+'"][data-st="'+i+'"]')||{}).value)||0;
+      if(bq>0) items.push({name:bp.name,qty:bq,price:bp.price});
+    });
+    // Leer la cantidad de cada EXTRA
     extras.forEach(function(ex,ei){
       var extQty=parseInt((lista.querySelector('input[data-ext="'+ei+'"][data-st="'+i+'"]')||{}).value)||0;
       if(extQty>0) items.push({name:ex.name,qty:extQty,price:ex.price});
     });
+    if(!items.length){ sinProducto++; return; } // marcado pero sin ningún producto
     var total=items.reduce(function(a,it){return a+it.price*it.qty;},0);
     ST.orders.push({id:uid(),studentId:st.id,studentName:st.name,schoolName:op.scName,levelName:op.lvName,gradeName:op.grName,phone:'',status:'paid',paymentMethod:'cash',total:total,items:items,createdAt:Date.now()});
     registrados++;
   });
+  if(sinProducto>0 && registrados===0){ alert('Marcaste '+sinProducto+' alumno(s) pero no pusiste cantidad en ningún producto. Poné al menos 1 en algún producto.'); return; }
   saveData();
   cerrarOvEfectivo();
   R();
@@ -1328,24 +1451,33 @@ function buildPlanilla(){
     var esSecGrupo = /secund/i.test(gr.gn||'')||gr.orders.some(function(o){return /secund/i.test(o.levelName||'');});
     html+='<div class="tw"><table><thead><tr>';
     if(esSecGrupo){
-      html+='<th>#</th><th>Alumno</th><th>Carpetas</th><th>Extras</th><th>Retrato</th><th>Grupo 1</th><th>Grupo 2</th><th>Total</th><th>Canal</th>';
+      html+='<th>#</th><th>Alumno</th><th>Productos</th><th>Extras</th><th>Retrato</th><th>Grupo 1</th><th>Grupo 2</th><th>Total</th><th>Canal</th>';
     } else {
-      html+='<th>#</th><th>Alumno</th><th>Carpetas</th><th>Extras</th><th>Retrato</th><th>Con Seno</th><th>Total</th><th>Canal</th>';
+      html+='<th>#</th><th>Alumno</th><th>Productos</th><th>Extras</th><th>Retrato</th><th>Con Seno</th><th>Total</th><th>Canal</th>';
     }
     html+='</tr></thead><tbody>';
 
     gr.orders.forEach(function(o,i){
       var pm=ST.photoMap[o.studentId]||{};
-      var bi=(o.items||[]).find(function(it){return ST.products.find(function(p){return p.name===it.name&&p.isBase;});});
-      var bq=bi?bi.qty:1;
+      // Productos BASE: listar todos con su cantidad (carpeta 3f, carpeta 2f, digitales...)
+      var baseItems=(o.items||[]).filter(function(it){return ST.products.find(function(p){return p.name===it.name&&p.isBase;});});
+      // Nombre corto para que la celda no sea enorme
+      function _corto(n){ n=(n||'').toUpperCase();
+        if(n.indexOf('DIGITAL')>=0||n.indexOf('ARCHIVO')>=0) return 'Digital';
+        if(n.indexOf('3 FOTO')>=0||n.indexOf('3FOTO')>=0) return 'Carp.3f';
+        if(n.indexOf('2 FOTO')>=0||n.indexOf('2FOTO')>=0) return 'Carp.2f';
+        return (n.charAt(0)+n.slice(1).toLowerCase()).slice(0,10);
+      }
+      var baseStr=baseItems.length?baseItems.map(function(it){return _corto(it.name)+' x'+it.qty;}).join('<br>'):'—';
+      var bq=baseItems.reduce(function(a,it){return a+(it.qty||0);},0); // total de carpetas (para color)
       // Extras: todo lo que no es base
       var exItems=(o.items||[]).filter(function(it){return !ST.products.find(function(p){return p.name===it.name&&p.isBase;});});
-      var exStr=exItems.length?exItems.map(function(it){return 'x'+it.qty;}).join(' '):'—';
+      var exStr=exItems.length?exItems.map(function(it){return _corto(it.name)+' x'+it.qty;}).join('<br>'):'—';
       html+='<tr>';
       html+='<td style="color:#94a3b8;font-weight:700">'+(i+1)+'</td>';
       html+='<td>'+esc(o.studentName)+'</td>';
-      html+='<td><strong style="color:'+(bq>1?'#fbbf24':'#34d399')+'">x'+bq+'</strong></td>';
-      html+='<td style="color:#f472b6;font-weight:700">'+exStr+'</td>';
+      html+='<td style="font-size:11px;color:'+(bq>1?'#fbbf24':'#34d399')+';font-weight:700">'+baseStr+'</td>';
+      html+='<td style="color:#f472b6;font-weight:700;font-size:11px">'+exStr+'</td>';
       if(esSecGrupo){
         var opS = o.opcionSec||'';
         var tieneExtraRet = (o.items||[]).some(function(it){return /retrato extra/i.test(it.name);});
@@ -1418,18 +1550,17 @@ function doBAT(){
   Object.keys(byGrade).forEach(function(gk){
     var grp=byGrade[gk];
 
-    // Contar carpetas totales
+    // Contar carpetas FÍSICAS totales (base y NO digital — los digitales no se imprimen)
+    function _esCarpetaFisica(it){ var p=ST.products.find(function(pp){return pp.name===it.name&&pp.isBase;}); return p && !esProductoDigital(p); }
     var tc=grp.orders.reduce(function(a,o){
-      var bi=(o.items||[]).find(function(it){return ST.products.find(function(p){return p.name===it.name&&p.isBase;});});
-      return a+(bi?bi.qty:0);
+      return a+(o.items||[]).reduce(function(b,it){return b+(_esCarpetaFisica(it)?(it.qty||0):0);},0);
     },0);
 
-    // Contar copias 20x28
+    // Contar copias 20x28 (solo carpetas físicas; digitales no cuentan)
     var t2028=0;
     grp.orders.forEach(function(o){
-      var bi=(o.items||[]).find(function(it){return ST.products.find(function(p){return p.name===it.name&&p.isBase;});});
-      var bq=bi?bi.qty:0;
-      t2028+=bq*2;
+      var bqF=(o.items||[]).reduce(function(b,it){return b+(_esCarpetaFisica(it)?(it.qty||0):0);},0);
+      t2028+=bqF*2;
       (o.items||[]).forEach(function(item){
         if(ST.products.find(function(p){return p.name===item.name&&!p.isBase&&!p.isCanvas;}))
           t2028+=item.qty;
@@ -1447,14 +1578,16 @@ function doBAT(){
       var pm=ST.photoMap[o.studentId]||{};
       if(!pm.retrato&&!pm.maestra) return;
       var apn=safeName(o.studentName||'ALUMNO');
-      var bi=(o.items||[]).find(function(it){return ST.products.find(function(p){return p.name===it.name&&p.isBase;});});
-      var bq=bi?bi.qty:1;
+      // Carpetas FÍSICAS del alumno (base y NO digital) — solo estas se imprimen
+      var bq=(o.items||[]).reduce(function(b,it){var p=ST.products.find(function(pp){return pp.name===it.name&&pp.isBase;}); return b+((p&&!esProductoDigital(p))?(it.qty||0):0);},0);
+      if(bq<1) bq=0; // si solo compró digital, no imprime carpeta física
       var er=0;
       (o.items||[]).forEach(function(item){
         if(ST.products.find(function(p){return p.name===item.name&&!p.isBase&&!p.isCanvas;}))
           er+=item.qty;
       });
       var tr=bq+er;
+      if(tr<1) return; // compró solo digital u otro no-físico: no imprime carpeta
 
       if(pm.retrato){
         var pr=tr>1?'X'+tr+'_':'';
@@ -3216,12 +3349,16 @@ function buildRendicion(){
   var realesPorNivel={};
   var totalReal=0, totalVerif=0, totalCarpetas=0, totalExtras=0;
 
+  var porProducto={}; // conteo detallado por nombre de producto
   pagados.forEach(function(o){
     var lv=o.levelName||'Sin nivel';
     if(!realesPorNivel[lv]) realesPorNivel[lv]={carpetas:0,extras:0,total:0,alumnos:0};
     realesPorNivel[lv].alumnos++;
     (o.items||[]).forEach(function(it){
       var prod=ST.products.find(function(p){return p.name===it.name;});
+      // Conteo detallado por producto (para el desglose)
+      var nom=it.name||'(sin nombre)';
+      porProducto[nom]=(porProducto[nom]||0)+(it.qty||0);
       if(prod&&prod.isBase){
         realesPorNivel[lv].carpetas+=it.qty;
         totalCarpetas+=it.qty;
@@ -3240,6 +3377,20 @@ function buildRendicion(){
   html+='<div class="stat"><div class="sn" style="color:#34d399">'+fmt(totalVerif)+'</div><div style="font-size:10px;color:#64748b;margin-top:3px">Verificado</div></div>';
   html+='<div class="stat"><div class="sn" style="color:#a5b4fc">'+fmt(totalReal)+'</div><div style="font-size:10px;color:#64748b;margin-top:3px">Total bruto</div></div>';
   html+='</div>';
+
+  // Desglose por producto (cuántos se vendieron de cada uno)
+  var _prodKeys=Object.keys(porProducto);
+  if(_prodKeys.length){
+    html+='<div style="background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:12px;margin-bottom:14px">';
+    html+='<div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Productos vendidos</div>';
+    _prodKeys.forEach(function(nom){
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #1e293b;font-size:13px">'
+        +'<span style="color:#e2e8f0">'+esc(nom)+'</span>'
+        +'<span style="color:#34d399;font-weight:800">x'+porProducto[nom]+'</span>'
+        +'</div>';
+    });
+    html+='</div>';
+  }
 
   html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
   html+='<thead><tr style="color:#64748b;border-bottom:1px solid #334155">';
@@ -3670,9 +3821,43 @@ function buildSobresManual(){
 
 function refrescarLista(){var cont=document.getElementById('lista-sobres');if(cont){var s=window.scrollY;cont.innerHTML=renderListaSobres();window.scrollTo(0,s);}}
 function toggleGrado(gid){if(!ST._gradosAbiertos)ST._gradosAbiertos={};ST._gradosAbiertos[gid]=!ST._gradosAbiertos[gid];refrescarLista();}
-function marcarSobre(stId,stName,gr){var base=ST.products.find(function(p){return p.isBase;});if(!base){alert('Sin carpeta base.');return;}var col=ST.schools.find(function(s){return s.id===ST._sobreColegio;});ST.orders.push({id:uid(),studentId:stId,studentName:stName,schoolName:col?col.name:'',levelName:'',gradeName:gr,phone:'SOBRE',status:'paid',paymentMethod:'cash',verificado:true,total:base.price,items:[{name:base.name,qty:1,price:base.price}],createdAt:Date.now(),esPromesa:false});saveData();refrescarLista();}
+function _sobreProductos(){
+  var col=ST.schools.find(function(s){return s.id===ST._sobreColegio;});
+  var bases=ST.products.filter(function(p){
+    if(!p.isBase) return false;
+    if(col&&col.productosBase&&col.productosBase.length){ return col.productosBase.indexOf(p.id)>=0; }
+    return true;
+  });
+  var extras=ST.products.filter(function(p){
+    if(p.isBase||p.isCanvas) return false;
+    if(col&&col.productosExtra&&col.productosExtra.length){ return col.productosExtra.indexOf(p.id)>=0; }
+    return true;
+  });
+  return { col:col, bases:bases, extras:extras };
+}
+function marcarSobre(stId,stName,gr){
+  var pp=_sobreProductos();
+  if(!pp.bases.length){alert('Este colegio no tiene productos configurados.');return;}
+  var base=pp.bases[0]; // arranca con el primer producto base del colegio en 1
+  ST.orders.push({id:uid(),studentId:stId,studentName:stName,schoolName:pp.col?pp.col.name:'',levelName:'',gradeName:gr,phone:'SOBRE',status:'paid',paymentMethod:'cash',verificado:true,total:base.price,items:[{name:base.name,qty:1,price:base.price}],createdAt:Date.now(),esPromesa:false});
+  saveData();refrescarLista();
+}
 function quitarSobre(oid){var o=ST.orders.find(function(x){return x.id===oid;});if(!o)return;if(!confirm('Quitar pago de '+o.studentName+'?'))return;ST.orders=ST.orders.filter(function(x){return x.id!==oid;});saveData();refrescarLista();}
-function ajustarSobre(oid,tipo,dir){var o=ST.orders.find(function(x){return x.id===oid;});if(!o)return;var ex=ST.products.find(function(p){return !p.isBase;});if(tipo==='carpeta'){o.items[0].qty=Math.max(1,Math.min(10,((o.items[0]&&o.items[0].qty)||1)+dir));}else{if(!o.items[1])o.items[1]={name:ex?ex.name:'Extra',qty:0,price:ex?ex.price:0};var qe=Math.max(0,Math.min(20,(o.items[1].qty||0)+dir));o.items[1].qty=qe;if(qe===0)o.items.splice(1,1);}o.total=o.items.reduce(function(a,it){return a+(it.price*it.qty);},0);saveData();refrescarLista();}
+function ajustarSobre(oid,pid,dir){
+  var o=ST.orders.find(function(x){return x.id===oid;});if(!o)return;
+  var prod=ST.products.find(function(p){return p.id===pid;});if(!prod)return;
+  if(!o.items) o.items=[];
+  var it=o.items.find(function(x){return x.name===prod.name;});
+  if(!it){
+    if(dir>0){ o.items.push({name:prod.name,qty:1,price:prod.price}); }
+  } else {
+    var nq=Math.max(0,Math.min(20,(it.qty||0)+dir));
+    it.qty=nq;
+    if(nq===0){ o.items=o.items.filter(function(x){return x.name!==prod.name;}); }
+  }
+  o.total=o.items.reduce(function(a,x){return a+(x.price*x.qty);},0);
+  saveData();refrescarLista();
+}
 function verificarUno(oid){var o=ST.orders.find(function(x){return x.id===oid;});if(o){o.verificado=true;saveData();refrescarLista();}}
 function verificarGrado(gid){var col=ST.schools.find(function(s){return s.id===ST._sobreColegio;});if(!col)return;var gr=null;col.levels.forEach(function(lv){lv.grades.forEach(function(g){if(g.id===gid)gr=g;});});if(!gr)return;if(!confirm('Verificar todos los pendientes de '+gr.name+'?'))return;var ids=gr.students.map(function(s){return s.id;});ST.orders.forEach(function(o){if(ids.indexOf(o.studentId)>=0&&o.paymentMethod==='alias'&&!o.verificado)o.verificado=true;});saveData();refrescarLista();}
 function generarQRAlias(){var url=ST.cfg.appUrl||'';if(!url){alert('Configurá la URL de la app en Config.');return;}var box=document.getElementById('qr-alias-box');if(!box)return;box.innerHTML='';var cont=document.createElement('div');cont.style.cssText='background:#fff;display:inline-block;padding:18px;border-radius:14px';box.appendChild(cont);try{new QRCode(cont,{text:url,width:200,height:200,correctLevel:QRCode.CorrectLevel.H});}catch(e){box.innerHTML='<div style="color:#ef4444">No se pudo generar el QR.</div>';return;}var info=document.createElement('div');info.style.cssText='margin-top:10px';info.innerHTML='<div style="font-size:13px;color:#94a3b8;word-break:break-all">'+url+'</div><button onclick="imprimirQRAlias()" style="margin-top:10px;background:#059669;color:#fff;border:none;border-radius:9px;padding:10px 20px;font-weight:700;cursor:pointer">Imprimir para el sobre</button>';box.appendChild(info);}
@@ -3732,15 +3917,21 @@ function renderListaSobres(){
         }
         html+='</div>';
         if(compro){
-          html+='<div style="display:flex;gap:14px;margin-top:8px;flex-wrap:wrap;align-items:center">';
-          html+='<div style="display:flex;align-items:center;gap:5px"><span style="font-size:12px;color:#94a3b8">Carpetas:</span>';
-          html+='<button class="btn-adj" data-oid="'+ped.id+'" data-tipo="carpeta" data-dir="-1" style="background:#334155;border:none;color:#fff;width:24px;height:24px;border-radius:6px;cursor:pointer;font-weight:700">-</button>';
-          html+='<span style="color:#fff;font-weight:700;min-width:18px;text-align:center">'+qC+'</span>';
-          html+='<button class="btn-adj" data-oid="'+ped.id+'" data-tipo="carpeta" data-dir="1" style="background:#334155;border:none;color:#fff;width:24px;height:24px;border-radius:6px;cursor:pointer;font-weight:700">+</button></div>';
-          html+='<div style="display:flex;align-items:center;gap:5px"><span style="font-size:12px;color:#94a3b8">Extra:</span>';
-          html+='<button class="btn-adj" data-oid="'+ped.id+'" data-tipo="extra" data-dir="-1" style="background:#334155;border:none;color:#fff;width:24px;height:24px;border-radius:6px;cursor:pointer;font-weight:700">-</button>';
-          html+='<span style="color:#f472b6;font-weight:700;min-width:18px;text-align:center">'+qE+'</span>';
-          html+='<button class="btn-adj" data-oid="'+ped.id+'" data-tipo="extra" data-dir="1" style="background:#334155;border:none;color:#fff;width:24px;height:24px;border-radius:6px;cursor:pointer;font-weight:700">+</button></div>';
+          html+='<div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;align-items:center">';
+          // Mostrar TODOS los productos del colegio (base + extra), cada uno con su +/-
+          var _pp=_sobreProductos();
+          var _todos=_pp.bases.concat(_pp.extras);
+          _todos.forEach(function(prod){
+            var it=(ped.items||[]).find(function(x){return x.name===prod.name;});
+            var qP=it?it.qty:0;
+            var colorNum=prod.isBase?'#fff':'#f472b6';
+            html+='<div style="display:flex;align-items:center;gap:5px;background:#0f172a;border-radius:8px;padding:4px 8px">';
+            html+='<span style="font-size:11px;color:#94a3b8;max-width:110px">'+esc(prod.name)+':</span>';
+            html+='<button class="btn-adj" data-oid="'+ped.id+'" data-pid="'+prod.id+'" data-dir="-1" style="background:#334155;border:none;color:#fff;width:24px;height:24px;border-radius:6px;cursor:pointer;font-weight:700">-</button>';
+            html+='<span style="color:'+colorNum+';font-weight:700;min-width:18px;text-align:center">'+qP+'</span>';
+            html+='<button class="btn-adj" data-oid="'+ped.id+'" data-pid="'+prod.id+'" data-dir="1" style="background:#334155;border:none;color:#fff;width:24px;height:24px;border-radius:6px;cursor:pointer;font-weight:700">+</button>';
+            html+='</div>';
+          });
           html+='<div style="margin-left:auto;font-weight:900;color:#34d399;font-size:15px">'+fmt(ped.total)+'</div>';
           html+='</div>';
         }
@@ -3776,7 +3967,7 @@ function conectarEventosLista(){
     btn.addEventListener('click',function(){quitarSobre(this.getAttribute('data-oid'));});
   });
   cont.querySelectorAll('.btn-adj').forEach(function(btn){
-    btn.addEventListener('click',function(){ajustarSobre(this.getAttribute('data-oid'),this.getAttribute('data-tipo'),parseInt(this.getAttribute('data-dir')));});
+    btn.addEventListener('click',function(){ajustarSobre(this.getAttribute('data-oid'),this.getAttribute('data-pid'),parseInt(this.getAttribute('data-dir')));});
   });
 }
 
@@ -3818,7 +4009,7 @@ function _refrescarListaOLD(){
     btn.addEventListener('click',function(){quitarSobre(this.getAttribute('data-oid'));});
   });
   cont.querySelectorAll('.btn-adj').forEach(function(btn){
-    btn.addEventListener('click',function(){ajustarSobre(this.getAttribute('data-oid'),this.getAttribute('data-tipo'),parseInt(this.getAttribute('data-dir')));});
+    btn.addEventListener('click',function(){ajustarSobre(this.getAttribute('data-oid'),this.getAttribute('data-pid'),parseInt(this.getAttribute('data-dir')));});
   });
 }
 
@@ -4595,7 +4786,7 @@ function buildEventoPlanilla(tipo,cfg){
       html+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
       var kb64=btoa(encodeURIComponent(tipo+'|||'+col.name+'|||'+gr.name));
       html+='<button onclick="exportarExcelEvento(\''+tipo+'\','+ci+','+gi+')" style="background:#1d4ed8;color:#fff;border:none;border-radius:7px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer">⬇ Excel</button>';
-      html+='<label style="background:#7c3aed;color:#fff;border:none;border-radius:7px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer">⬆ Reimportar<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="reimportarExcelEvento(event,\''+tipo+'\','+ci+','+gi+')"></label>';
+      html+='<label style="background:#7c3aed;color:#fff;border:none;border-radius:7px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer">⬆ Reimportar<input type="file" accept=".xlsx,.xls,.csv,.jpg,.jpeg,.png,.webp,image/*,application/pdf,.pdf" style="display:none" onchange="reimportarExcelEvento(event,\''+tipo+'\','+ci+','+gi+')"></label>';
       html+='<button data-evbatkey="'+kb64+'" onclick="doBATEvento(this)" style="background:#059669;color:#fff;border:none;border-radius:7px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer">⚡ BAT</button>';
       html+='</div></div></div>';
 
@@ -4751,49 +4942,75 @@ function exportarExcelEvento(tipo,ci,gi){
   var col=ST.eventos[tipo].colegios[ci];
   var gr=col.grados[gi];
   var pm=ST.eventoPhotoMap&&ST.eventoPhotoMap[tipo]||{};
+  // Volcar los números ya cargados (retrato/maestra) al photoMap temporal que usa buildHojaGrado
+  var _bak={};
+  (gr.students||[]).forEach(function(st){
+    if(pm[st.id]){ _bak[st.id]=ST.photoMap[st.id]; ST.photoMap[st.id]={retrato:pm[st.id].retrato||'',maestra:pm[st.id].maestra||''}; }
+  });
+  // buildHojaGrado necesita {sc,lv,gr}; en eventos no hay nivel, usamos uno "PRIMARIA" ficticio
+  var gObj={sc:{name:col.name},lv:{name:'PRIMARIA'},gr:gr};
+  var ws=buildHojaGrado(gObj);
+  // Restaurar el photoMap original (no tocamos el del sistema colegios)
+  (gr.students||[]).forEach(function(st){ if(_bak.hasOwnProperty(st.id)){ if(_bak[st.id]===undefined) delete ST.photoMap[st.id]; else ST.photoMap[st.id]=_bak[st.id]; } });
   var wb=XLSX.utils.book_new();
-  var header=['N','APELLIDO Y NOMBRE','COMPRO','N_FOTO'];
-  var data=[header];
-  var pedidos=ST.orders.filter(function(o){
-    return (tipo==='promesa'?(o.esPromesa&&!o.esDiplomas):o.esDiplomas)
-      && o.schoolName===col.name && o.gradeName===gr.name;
-  });
-  (gr.students||[]).forEach(function(st,i){
-    var ped=pedidos.find(function(o){return o.studentId===st.id;});
-    var nFoto=(pm[st.id]&&pm[st.id].foto)||'';
-    data.push([i+1,st.name,ped?'SI':'',nFoto]);
-  });
-  var ws=XLSX.utils.aoa_to_sheet(data);
-  ws['!cols']=[{wch:5},{wch:40},{wch:8},{wch:12}];
-  XLSX.utils.book_append_sheet(wb,ws,'Fotos');
+  XLSX.utils.book_append_sheet(wb,ws,gr.name.slice(0,31));
   XLSX.writeFile(wb,'FOTOS_'+tipo.toUpperCase()+'_'+gr.name.replace(/[^A-Z0-9]/gi,'_')+'.xlsx');
 }
 
 function reimportarExcelEvento(e,tipo,ci,gi){
   var file=e.target.files[0]; if(!file) return;
+  // Si es una IMAGEN o PDF (planilla escaneada a mano), leerla con IA
+  var _t=(file.type||'').toLowerCase();
+  var _n=(file.name||'').toLowerCase();
+  var esImg = _t.indexOf('image')>=0 || _t==='application/pdf' || /\.(jpe?g|png|webp|gif|bmp|heic|pdf)$/i.test(_n);
+  var esExcelReal = /\.(xlsx|xls|csv)$/i.test(_n) || _t.indexOf('spreadsheet')>=0 || _t.indexOf('csv')>=0 || _t.indexOf('excel')>=0;
+  if(esImg && !esExcelReal){
+    // Pasar el contexto del grado para armar la planilla completa de LECTURA
+    var _col=ST.eventos[tipo].colegios[ci]; var _gr=_col.grados[gi];
+    var _ctx={ colName:_col.name, gradeName:_gr.name, levelName:'PRIMARIA', students:(_gr.students||[]), fname:'FOTOS_'+_gr.name.replace(/[^A-Z0-9]/gi,'_')+'_PRIMARIA (LECTURA).xlsx' };
+    leerPlanillaIA(file, e.target, _ctx); return;
+  }
   readFile(file,function(rows){
     if(!ST.eventoPhotoMap) ST.eventoPhotoMap={};
     if(!ST.eventoPhotoMap[tipo]) ST.eventoPhotoMap[tipo]={};
     var pm=ST.eventoPhotoMap[tipo];
     var col=ST.eventos[tipo].colegios[ci];
     var gr=col.grados[gi];
-    var header=rows[0]||[];
-    var iNombre=header.findIndex(function(h){return /nombre|apellido/i.test(h);});
-    var iFoto=header.findIndex(function(h){return /foto|numero|n_foto/i.test(h);});
-    if(iNombre<0) iNombre=1; if(iFoto<0) iFoto=3;
+    var hdr=(rows[0]||[]).map(function(x){return String(x||'').toLowerCase();});
+    var iNombre=hdr.findIndex(function(h){return h.indexOf('nombre')>=0||h.indexOf('apellido')>=0;});
+    // Detectar TODAS las columnas de retrato y de con seño (2 casilleros c/u)
+    var colsRet=[]; var colsMae=[];
+    hdr.forEach(function(h,idx){
+      if(h.indexOf('retrato')>=0) colsRet.push(idx);
+      if(h.indexOf('maestra')>=0||h.indexOf('seno')>=0||h.indexOf('seño')>=0) colsMae.push(idx);
+    });
+    // Fallback formato viejo (una sola columna N_FOTO)
+    if(!colsRet.length){ var iF=hdr.findIndex(function(h){return h.indexOf('foto')>=0||h.indexOf('numero')>=0||h.indexOf('n_foto')>=0;}); if(iF>=0) colsRet.push(iF); }
+    if(iNombre<0) iNombre=1;
+    // Toma el ÚLTIMO casillero con número
+    function ultimoNumEv(row,cols){ var v=''; cols.forEach(function(ci){ var x=String(row[ci]||'').trim().replace(/\D/g,''); if(x) v=x; }); return v; }
     var actualizados=0;
     rows.slice(1).forEach(function(row){
       var nombre=(row[iNombre]||'').toString().trim();
-      var nFoto=(row[iFoto]||'').toString().trim();
-      if(!nombre||!nFoto) return;
+      if(!nombre) return;
       var st=(gr.students||[]).find(function(s){
         return s.name.toLowerCase()===nombre.toLowerCase()||
           safeName(s.name)===safeName(nombre);
       });
-      if(st){pm[st.id]={foto:nFoto};actualizados++;}
+      if(!st) return;
+      var vr=ultimoNumEv(row,colsRet);
+      var vm=ultimoNumEv(row,colsMae);
+      if(!vr && !vm) return;
+      var reg=pm[st.id]||{};
+      if(vr) reg.retrato=vr;
+      if(vm) reg.maestra=vm;
+      // Compat: mantener .foto = retrato para el resto del sistema de eventos
+      if(vr) reg.foto=vr;
+      pm[st.id]=reg;
+      actualizados++;
     });
     saveData();
-    alert(actualizados+' alumnos actualizados con números de foto.');
+    alert('Actualizado: '+actualizados+' alumnos con números de foto.');
     R();
   });
 }
@@ -4884,6 +5101,16 @@ function exportarColegio(scId){
 function reimportarGrado(ev, gi){
   var fileList=ev.target.files;
   if(!fileList||!fileList.length){ alert('No se seleccionó ningún archivo.'); return; }
+  // Si el primer archivo es imagen/PDF (planilla escaneada), leerla con IA
+  var _p0=fileList[0], _t0=(_p0.type||'').toLowerCase(), _n0=(_p0.name||'').toLowerCase();
+  var _img0=_t0.indexOf('image')>=0||_t0==='application/pdf'||/\.(jpe?g|png|webp|gif|bmp|heic|pdf)$/i.test(_n0);
+  var _xls0=/\.(xlsx|xls|csv)$/i.test(_n0)||_t0.indexOf('spreadsheet')>=0||_t0.indexOf('csv')>=0;
+  if(_img0 && !_xls0){
+    var _gg=getGrados(); var _g=_gg&&_gg[gi];
+    var _ctx=null;
+    if(_g){ _ctx={ colName:(_g.sc&&_g.sc.name)||'', gradeName:(_g.gr&&_g.gr.name)||'', levelName:(_g.lv&&_g.lv.name)||'PRIMARIA', students:(_g.gr&&_g.gr.students)||[], fname:'FOTOS_'+((_g.gr&&_g.gr.name)||'').replace(/[^A-Z0-9]/gi,'_')+'_'+((_g.lv&&_g.lv.name)||'PRIMARIA').replace(/[^A-Z0-9]/gi,'_')+' (LECTURA).xlsx' }; }
+    leerPlanillaIA(_p0, ev.target, _ctx); return;
+  }
   var files=[];
   for(var fi=0;fi<fileList.length;fi++){ files.push(fileList[fi]); }
   ev.target.value='';
@@ -5048,6 +5275,10 @@ function exportarColegioDesdeADN(){
 function reimportarGlobal(ev){
   var fileList=ev.target.files;
   if(!fileList||!fileList.length){ alert('No se seleccionó ningún archivo.'); return; }
+  // Si el PRIMER archivo es una imagen (planilla escaneada), leerla con IA
+  var primero=fileList[0];
+  var esImg = /^image\//.test(primero.type) || /\.(jpe?g|png|webp)$/i.test(primero.name);
+  if(esImg){ leerPlanillaIA(primero, ev.target); return; }
   var files=[];
   for(var fi=0;fi<fileList.length;fi++){ files.push(fileList[fi]); }
   ev.target.value='';
@@ -5678,6 +5909,11 @@ function reimportarNivel(ev){
   // (ev.target.files es una referencia viva que se vacía al limpiar value)
   var fileList=ev.target.files;
   if(!fileList||!fileList.length){ alert('No se seleccionó ningún archivo.'); return; }
+  // Si el primer archivo es imagen/PDF (planilla escaneada), leerla con IA
+  var _p0=fileList[0], _t0=(_p0.type||'').toLowerCase(), _n0=(_p0.name||'').toLowerCase();
+  var _img0=_t0.indexOf('image')>=0||_t0==='application/pdf'||/\.(jpe?g|png|webp|gif|bmp|heic|pdf)$/i.test(_n0);
+  var _xls0=/\.(xlsx|xls|csv)$/i.test(_n0)||_t0.indexOf('spreadsheet')>=0||_t0.indexOf('csv')>=0;
+  if(_img0 && !_xls0){ leerPlanillaIA(_p0, ev.target); return; }
   var files=[];
   for(var fi=0;fi<fileList.length;fi++){ files.push(fileList[fi]); }
   ev.target.value='';
