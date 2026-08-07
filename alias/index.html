@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1786077638";
+  var APP_VERSION="1786119939";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -2551,6 +2551,11 @@ function syncFromSheets(){
           existe.total=parseFloat(o.total)||0;
           actualizados++;
         }
+        // Sincronizar estado verificado desde el Sheet (por si se verificó en otro dispositivo)
+        var eEx=String(o.estado||'').toUpperCase().trim();
+        if(o.canal!=='Sobre' && (eEx==='VERIFICADO'||eEx.indexOf('VERIFICADO')===0) && !existe.verificado){
+          existe.verificado=true; actualizados++;
+        }
         return;
       }
       // Detectar promesa/diplomas por el texto
@@ -2567,7 +2572,12 @@ function syncFromSheets(){
         total:parseFloat(o.total)||0,
         status:'paid',
         paymentMethod:o.canal==='Sobre'?'cash':(o.canal==='Alias'?'alias':'mp'),
-        verificado:(o.canal==='Sobre'?true:false),
+        verificado:(function(){
+          if(o.canal==='Sobre') return true;
+          var e=String(o.estado||'').toUpperCase().trim();
+          // Solo verificado si el estado es exactamente VERIFICADO (no "SIN VERIFICAR" ni "CON COMPROBANTE")
+          return e==='VERIFICADO' || e.indexOf('VERIFICADO')===0;
+        })(),
         items:items,
         compRemoto:(String(o.tieneComprobante||'').toUpperCase().indexOf('S')===0)||(String(o.estado||'').toUpperCase().indexOf('COMPROBANTE')>=0),
         createdAt:new Date(o.fecha).getTime()||Date.now(),
@@ -3991,7 +4001,15 @@ function ajustarSobre(oid,pid,dir){
   o.total=o.items.reduce(function(a,x){return a+(x.price*x.qty);},0);
   saveData();refrescarLista();
 }
-function verificarUno(oid){var o=ST.orders.find(function(x){return x.id===oid;});if(o){o.verificado=true;saveData();refrescarLista();}}
+function marcarEstadoSheet(oid, estado){
+  var url=(ST.cfg.sheetsUrl||'').trim();
+  if(!url) return;
+  try{
+    fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'marcarEstado',id:oid,estado:estado})}).catch(function(){});
+  }catch(e){}
+}
+
+function verificarUno(oid){var o=ST.orders.find(function(x){return x.id===oid;});if(o){o.verificado=true;saveData();marcarEstadoSheet(oid,'VERIFICADO');refrescarLista();}}
 function verificarGrado(gid){var col=ST.schools.find(function(s){return s.id===ST._sobreColegio;});if(!col)return;var gr=null;col.levels.forEach(function(lv){lv.grades.forEach(function(g){if(g.id===gid)gr=g;});});if(!gr)return;if(!confirm('Verificar todos los pendientes de '+gr.name+'?'))return;var ids=gr.students.map(function(s){return s.id;});ST.orders.forEach(function(o){if(ids.indexOf(o.studentId)>=0&&o.paymentMethod==='alias'&&!o.verificado)o.verificado=true;});saveData();refrescarLista();}
 function generarQRAlias(){var url=ST.cfg.appUrl||'';if(!url){alert('Configurá la URL de la app en Config.');return;}var box=document.getElementById('qr-alias-box');if(!box)return;box.innerHTML='';var cont=document.createElement('div');cont.style.cssText='background:#fff;display:inline-block;padding:18px;border-radius:14px';box.appendChild(cont);try{new QRCode(cont,{text:url,width:200,height:200,correctLevel:QRCode.CorrectLevel.H});}catch(e){box.innerHTML='<div style="color:#ef4444">No se pudo generar el QR.</div>';return;}var info=document.createElement('div');info.style.cssText='margin-top:10px';info.innerHTML='<div style="font-size:13px;color:#94a3b8;word-break:break-all">'+url+'</div><button onclick="imprimirQRAlias()" style="margin-top:10px;background:#059669;color:#fff;border:none;border-radius:9px;padding:10px 20px;font-weight:700;cursor:pointer">Imprimir para el sobre</button>';box.appendChild(info);}
 function imprimirQRAlias(){var box=document.getElementById('qr-alias-box');if(!box)return;var qrImg=box.querySelector('img')||box.querySelector('canvas');if(!qrImg){alert('Generá el QR primero.');return;}var src=qrImg.tagName==='IMG'?qrImg.src:qrImg.toDataURL();var w=window.open('','_blank');w.document.write('<html><head><title>QR</title></head><body style="text-align:center;font-family:Arial;padding:40px"><h2>Comprá las fotos escolares</h2><img src="'+src+'" style="width:300px;height:300px"><br><p style="font-size:18px;font-weight:bold">Escaneá el código para entrar</p></body></html>');w.document.close();setTimeout(function(){w.print();},400);}
