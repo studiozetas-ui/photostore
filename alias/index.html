@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1786240716";
+  var APP_VERSION="1786246554";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -3927,8 +3927,8 @@ function buildVerificar(){
   setTimeout(function(){
     var fi=document.getElementById('verif-fecha');
     if(fi) fi.addEventListener('change',function(){ST._verifFecha=this.value;R();});
-    document.querySelectorAll('.btn-verif-ok').forEach(function(btn){btn.addEventListener('click',function(){var o=ST.orders.find(function(x){return x.id===btn.getAttribute('data-oid');});if(o){o.verificado=true;saveData();R();}});});
-    document.querySelectorAll('.btn-verif-undo').forEach(function(btn){btn.addEventListener('click',function(){var o=ST.orders.find(function(x){return x.id===btn.getAttribute('data-oid');});if(o){o.verificado=false;saveData();R();}});});
+    document.querySelectorAll('.btn-verif-ok').forEach(function(btn){btn.addEventListener('click',function(){var o=ST.orders.find(function(x){return x.id===btn.getAttribute('data-oid');});if(o){o.verificado=true;saveData();marcarEstadoSheet(o.id,'VERIFICADO');R();}});});
+    document.querySelectorAll('.btn-verif-undo').forEach(function(btn){btn.addEventListener('click',function(){var o=ST.orders.find(function(x){return x.id===btn.getAttribute('data-oid');});if(o){o.verificado=false;saveData();marcarEstadoSheet(o.id,'COMPROBANTE SIN VERIFICAR');R();}});});
     document.querySelectorAll('.btn-verif-del').forEach(function(btn){btn.addEventListener('click',function(){var oid=btn.getAttribute('data-oid');if(!confirm('Eliminar?'))return;ST.orders=ST.orders.filter(function(x){return x.id!==oid;});saveData();R();});});
     document.querySelectorAll('.comp-thumb').forEach(function(img){img.addEventListener('click',function(){var full=img.getAttribute('data-full');if(full)verComprobanteFull(full);});});
   },50);
