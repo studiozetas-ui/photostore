@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1786259766";
+  var APP_VERSION="1786290197";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -6598,22 +6598,24 @@ function descMostrarFotos(st, grObj, scObj, cont){
   var _fotosListas = [];   // {tipo, num, url, urlDescarga}
   var _pendientes = items.length;
 
+  grid.style.cssText = 'display:flex;flex-direction:row;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px';
   items.forEach(function(item){
     var card = document.createElement('div');
-    card.style.cssText = 'background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;text-align:center';
-    card.innerHTML = '<div style="color:#818cf8;font-weight:700;font-size:14px;margin-bottom:8px">'+item.tipo+'</div><div style="color:#64748b;font-size:12px">\u23f3 Buscando tu foto...</div>';
+    card.style.cssText = 'background:#1e293b;border:1px solid #334155;border-radius:10px;padding:8px;text-align:center;flex:1;min-width:90px;max-width:130px';
+    card.innerHTML = '<div style="color:#818cf8;font-weight:700;font-size:11px;margin-bottom:6px">'+item.tipo+'</div><div style="color:#64748b;font-size:10px;padding:14px 0">\u23f3</div>';
     grid.appendChild(card);
 
     var gradoNom = (grObj && grObj.name) ? grObj.name : '';
-    fetch(fotosUrl + '?action=getFoto&num=' + encodeURIComponent(item.num) + '&grado=' + encodeURIComponent(gradoNom))
+    // Usar base64 (sin CORS) para que la preview SIEMPRE se vea
+    fetch(fotosUrl + '?action=getFotoBase64&num=' + encodeURIComponent(item.num) + '&grado=' + encodeURIComponent(gradoNom))
       .then(function(r){ return r.json(); })
       .then(function(res){
-        if(res.ok && res.encontrada){
-          card.innerHTML = '<div style="color:#818cf8;font-weight:700;font-size:14px;margin-bottom:8px">'+item.tipo+'</div>'+
-            '<img src="'+res.url+'" style="width:100%;max-width:280px;border-radius:8px" crossorigin="anonymous">';
-          _fotosListas.push({tipo:item.tipo, num:item.num, url:res.url, urlDescarga:res.urlDescarga});
+        if(res.ok && res.encontrada && res.dataUrl){
+          card.innerHTML = '<div style="color:#818cf8;font-weight:700;font-size:11px;margin-bottom:6px">'+item.tipo+'</div>'+
+            '<img src="'+res.dataUrl+'" style="width:100%;border-radius:6px">';
+          _fotosListas.push({tipo:item.tipo, num:item.num});
         } else {
-          card.innerHTML = '<div style="color:#818cf8;font-weight:700;font-size:14px;margin-bottom:8px">'+item.tipo+'</div><div style="color:#f87171;font-size:12px">Esta foto todav\u00eda no est\u00e1 subida.</div>';
+          card.innerHTML = '<div style="color:#818cf8;font-weight:700;font-size:11px;margin-bottom:6px">'+item.tipo+'</div><div style="color:#f87171;font-size:10px">No subida a\u00fan</div>';
         }
       })
       .catch(function(){
