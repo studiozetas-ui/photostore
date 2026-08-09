@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1786247759";
+  var APP_VERSION="1786251919";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -338,7 +338,7 @@ function R(){
     else if(ST.view==='diplomas')       root.innerHTML=buildDiplomas();
     else if(ST.view==='diplomas_compra')root.innerHTML=buildDiplomasCompra();
     else if(ST.view==='diplomas_ok')    root.innerHTML=buildDiplomasOk();
-    else if(ST.view==='descargar')      root.innerHTML=buildDescargar();
+    else if(ST.view==='descargar'){ root.innerHTML=buildDescargar(); if(!ST._descSynced){ ST._descSynced=true; try{ syncFromSheets(true, function(){ reconectarStudentIds(); if(ST.view==='descargar') root.innerHTML=buildDescargar(); }); }catch(e){} } }
     else                                root.innerHTML=buildLanding();
   }catch(e){
     root.innerHTML='<div style="color:#ef4444;padding:30px;font-size:16px;background:#0f172a;min-height:100vh"><b>ERROR:</b> '+e.message+'<br><small>'+e.stack+'</small></div>';
@@ -2570,15 +2570,15 @@ function buscarStudentIdPorNombre(nombre, colegio, grado){
   return encontrado;
 }
 
-function syncFromSheets(){
+function syncFromSheets(silencioso, cb){
   var url=(ST.cfg.sheetsUrl||'').trim();
-  if(!url){alert('URL de Google Sheets no configurada.');return;}
+  if(!url){ if(!silencioso)alert('URL de Google Sheets no configurada.'); if(cb)cb(); return;}
   var btn=document.getElementById('sync-btn');
   if(btn) btn.textContent='Sincronizando...';
   fetch(url)
   .then(function(r){return r.json();})
   .then(function(data){
-    if(!data.ok){alert('Error al sincronizar.');if(btn)btn.textContent='🔄 Sincronizar';return;}
+    if(!data.ok){ if(!silencioso)alert('Error al sincronizar.'); if(btn)btn.textContent='🔄 Sincronizar'; if(cb)cb(); return;}
     var nuevos=0, actualizados=0;
     console.log('=== LLEGARON '+((data.orders||[]).length)+' PEDIDOS DEL SHEET ==='); (data.orders||[]).forEach(function(o){ console.log('CRUDO: '+o.studentName+' | canal=['+o.canal+'] | estado=['+o.estado+']'); });
     (data.orders||[]).forEach(function(o){
@@ -2633,12 +2633,12 @@ function syncFromSheets(){
     });
     saveData();
     if(btn) btn.textContent='🔄 Sincronizar';
-    alert('Sincronizado ✅\n'+nuevos+' pedidos nuevos'+(actualizados?', '+actualizados+' actualizados':'')+'.');
-    R();
+    if(!silencioso) alert('Sincronizado ✅\n'+nuevos+' pedidos nuevos'+(actualizados?', '+actualizados+' actualizados':'')+'.');
+    if(cb) cb(); else R();
   })
   .catch(function(err){
     if(btn) btn.textContent='🔄 Sincronizar';
-    alert('Error al sincronizar: '+err.message);
+    if(!silencioso) alert('Error al sincronizar: '+err.message); if(cb) cb();
   });
 }
 
