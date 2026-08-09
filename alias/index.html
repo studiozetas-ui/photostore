@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1786258055";
+  var APP_VERSION="1786259766";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -6577,7 +6577,7 @@ function descMostrarFotos(st, grObj, scObj, cont){
     return;
   }
 
-  html += '<div style="color:#94a3b8;font-size:13px;text-align:center;margin-bottom:14px">Tocá cada foto para descargarla</div>';
+  html += '<div style="color:#94a3b8;font-size:13px;text-align:center;margin-bottom:14px">Estas son tus fotos:</div>';
   // Diagnóstico para el admin (ayuda a verificar nombres en Drive)
   var esAdminDesc = (localStorage.getItem('psz4_admin_ok')==='1');
   if(esAdminDesc && grObj){
@@ -6624,7 +6624,7 @@ function descMostrarFotos(st, grObj, scObj, cont){
         if(_pendientes<=0){
           var cont2 = document.getElementById('desc-boton-todas');
           if(cont2 && _fotosListas.length){
-            window._descFotosParaBajar = _fotosListas;
+            window._descFotosParaBajar = _fotosListas; window._descGradoNom = (grObj && grObj.name) ? grObj.name : '';
             cont2.innerHTML = '<button onclick="descargarTodasLasFotos(this)" style="width:100%;background:#059669;color:#fff;border:none;border-radius:12px;padding:16px;font-weight:800;cursor:pointer;font-size:16px">\u2b07 Descargar '+_fotosListas.length+' foto'+(_fotosListas.length>1?'s':'')+'</button>'+
               '<div style="color:#64748b;font-size:11px;text-align:center;margin-top:8px">Se guardan en tu tel\u00e9fono (carpeta Descargas / Fotos)</div>';
           }
@@ -6637,40 +6637,35 @@ function descMostrarFotos(st, grObj, scObj, cont){
 function descargarTodasLasFotos(btn){
   var fotos = window._descFotosParaBajar || [];
   if(!fotos.length) return;
-  if(btn){ btn.textContent = 'Descargando...'; btn.disabled = true; }
-  var i = 0;
+  var fotosUrl = (ST.cfg.fotosUrl||'').trim();
+  var gradoNom = window._descGradoNom || '';
+  if(btn){ btn.textContent = 'Descargando... esperá'; btn.disabled = true; }
+  var i = 0, bajadas = 0;
   function bajarSiguiente(){
     if(i >= fotos.length){
-      if(btn){ btn.textContent = '\u2705 Listo, revis\u00e1 tus fotos'; btn.style.background='#334155'; }
+      if(btn){ btn.textContent = bajadas+' foto'+(bajadas!==1?'s':'')+' descargada'+(bajadas!==1?'s':'')+' \u2705'; btn.style.background='#334155'; btn.disabled=false; }
       return;
     }
     var f = fotos[i]; i++;
-    descBajarArchivoReal(f.url, f.urlDescarga, f.num, function(){
-      setTimeout(bajarSiguiente, 700); // esperar un momento entre cada una
-    });
+    if(btn) btn.textContent = 'Descargando '+i+' de '+fotos.length+'...';
+    // Pedir la foto en base64 al Apps Script (sin CORS) y descargarla
+    fetch(fotosUrl + '?action=getFotoBase64&num=' + encodeURIComponent(f.num) + '&grado=' + encodeURIComponent(gradoNom))
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        if(res.ok && res.encontrada && res.dataUrl){
+          var a = document.createElement('a');
+          a.href = res.dataUrl;
+          a.download = (f.num||'foto') + '.jpg';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(function(){ document.body.removeChild(a); }, 500);
+          bajadas++;
+        }
+        setTimeout(bajarSiguiente, 800);
+      })
+      .catch(function(){ setTimeout(bajarSiguiente, 800); });
   }
   bajarSiguiente();
-}
-
-// Baja una imagen como archivo real (fetch -> blob -> link download)
-function descBajarArchivoReal(url, urlFallback, nombre, cb){
-  fetch(url)
-    .then(function(r){ if(!r.ok) throw new Error('no'); return r.blob(); })
-    .then(function(blob){
-      var a = document.createElement('a');
-      var objUrl = URL.createObjectURL(blob);
-      a.href = objUrl;
-      a.download = (nombre||'foto') + '.jpg';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(objUrl); }, 1500);
-      if(cb) cb();
-    })
-    .catch(function(){
-      // Si falla el fetch (CORS), abrir la descarga directa de Drive en pestaña
-      window.open(urlFallback || url, '_blank');
-      if(cb) cb();
-    });
 }
 
 function descDescargarUna(url, num){
