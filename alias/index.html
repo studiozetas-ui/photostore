@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1786204415";
+  var APP_VERSION="1786221310";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -201,6 +201,13 @@ function loadData(){
       if(d.schools)  ST.schools=d.schools;
       if(d.products) ST.products=d.products;
       if(d.orders)   ST.orders=d.orders;
+      // Reinyectar comprobantes (imágenes) desde la clave separada
+      try{
+        var _rawC=localStorage.getItem('psz4_comp');
+        if(_rawC){ var _comps=JSON.parse(_rawC);
+          (ST.orders||[]).forEach(function(o){ if(!o.comprobante && _comps[o.id]){ o.comprobante=_comps[o.id].img; o.compTipo=_comps[o.id].tipo||'img'; } });
+        }
+      }catch(e){ console.error('comp load:',e); }
       if(d.photoMap) ST.photoMap=d.photoMap;
       if(d.cfg){ST.cfg=Object.assign({},ST.cfg,d.cfg);if(d.cfg.claudeKey)ST.cfg.claudeKey=d.cfg.claudeKey;}
       if(typeof d.modoPrueba!=='undefined') ST.modoPrueba=d.modoPrueba;
@@ -248,13 +255,29 @@ function cleanPhotoMap(){
     saveData();
   }
 }
+function guardarCompSep(oid, img, tipo){
+  try{
+    var cc=JSON.parse(localStorage.getItem('psz4_comp')||'{}');
+    cc[oid]={img:img, tipo:tipo||'img'};
+    localStorage.setItem('psz4_comp', JSON.stringify(cc));
+  }catch(e){ console.error('guardarCompSep:',e); }
+}
+
 function saveData(){
   try{
-    // Los comprobantes (base64) se guardan CON el pedido (como funcionaba bien)
+    // Comprobantes (imágenes base64) en clave SEPARADA para no saturar el guardado principal
+    var comps={};
+    (ST.orders||[]).forEach(function(o){ if(o.comprobante) comps[o.id]={img:o.comprobante,tipo:o.compTipo||'img'}; });
+    try{ localStorage.setItem('psz4_comp', JSON.stringify(comps)); }catch(e){ console.error('comp save:',e); }
+    // Orders SIN la imagen (liviano) en el guardado principal
+    var ordersLite=(ST.orders||[]).map(function(o){
+      if(o.comprobante){ var cp=Object.assign({},o); delete cp.comprobante; cp._tieneComp=true; return cp; }
+      return o;
+    });
     var toSave={
       schools:ST.schools,
       products:ST.products,
-      orders:ST.orders,
+      orders:ordersLite,
       photoMap:ST.photoMap,
       images:{logo:null,prodImgs:{}},
       cfg:ST.cfg,
@@ -2548,7 +2571,8 @@ function syncFromSheets(){
           existe.verificado=true;
         }
         // Marcar si tenía comprobante remoto
-        if(!existe.comprobante){ existe.compRemoto=(String(o.tieneComprobante||'').toUpperCase().indexOf('S')===0)||(String(o.estado||'').toUpperCase().indexOf('COMPROBANTE')>=0); }
+        // Solo marcar remoto si NO hay comprobante local (nunca pisar la foto local)
+        if(!existe.comprobante){ existe.compRemoto=(String(o.tieneComprobante||'').toUpperCase().indexOf('S')===0)||(String(o.estado||'').toUpperCase().indexOf('COMPROBANTE')>=0); } else { existe.compRemoto=false; }
         actualizados++;
         return;
       }
@@ -3816,6 +3840,8 @@ function confirmarPedidoAlias(){
   order.comprobante=window._aliasComprobante;
   order.compTipo=window._aliasCompTipo||'img';
   order.status='paid'; order.paymentMethod='alias'; order.verificado=false;
+  order.compRemoto=false;
+  guardarCompSep(order.id, order.comprobante, order.compTipo);
   saveData(); sendToSheets(order);
   var sb=gel('root')&&gel('root').querySelector('.s-body');
   if(sb) sb.innerHTML='<div style="text-align:center;padding:50px 20px"><div style="font-size:64px;margin-bottom:13px">✅</div><h2 style="font-size:22px;font-weight:900;color:#34d399;margin-bottom:8px">Pedido confirmado</h2><p style="color:#94a3b8;font-size:14px;margin-bottom:5px">'+esc(student&&student.name||'')+'</p><p style="font-size:24px;font-weight:900;color:#34d399;margin-bottom:10px">'+fmt(order.total)+'</p><p style="color:#64748b;font-size:13px;margin-bottom:26px">Tu comprobante fue recibido. Verificaremos el pago y prepararemos tu pedido.</p><button class="btn btn-G btn-sm" onclick="volverAlInicio()">Volver al inicio</button></div>';
@@ -3881,6 +3907,10 @@ function buildVerificar(){
 }
 
 function tarjetaPago(o,verificado){
+  // Recuperar el comprobante desde la clave separada si se perdió de la memoria
+  if(!o.comprobante && o.id){
+    try{ var _cc=JSON.parse(localStorage.getItem('psz4_comp')||'{}'); if(_cc[o.id]){ o.comprobante=_cc[o.id].img; o.compTipo=_cc[o.id].tipo||'img'; o.compRemoto=false; } }catch(e){}
+  }
   var h='<div style="background:#1e293b;border:1px solid '+(verificado?'#22c55e':'#fbbf24')+';border-radius:14px;padding:14px;margin-bottom:10px">';
   h+='<div style="display:flex;gap:12px">';
   if(o.comprobante&&o.compTipo!=='pdf') h+='<img src="'+o.comprobante+'" class="comp-thumb" data-full="'+o.comprobante+'" style="width:70px;height:70px;object-fit:cover;border-radius:8px;cursor:pointer;flex-shrink:0">';
