@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1786313286";
+  var APP_VERSION="1786317763";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -2179,7 +2179,7 @@ function buildS2(){
     var precioU=(eq>=descU)?roundNice(ep.price*(1-descP/100)):ep.price;
     _totalPacks += precioU*eq;
   }); }
-  if(hayPackElegido() && (!esSecundaria || ST.sel.opcionSec)){
+  if(hayAlgoParaComprar() && (!esSecundaria || ST.sel.opcionSec)){
     html+='<div style="margin-top:14px;padding:14px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.3);border-radius:12px;text-align:center"><div style="font-size:12px;color:#94a3b8">Total productos</div><div style="font-size:24px;font-weight:900;color:#34d399">'+fmt(_totalPacks)+'</div></div>';
     html+='<button class="pay-btn" style="margin-top:12px;font-size:17px;padding:15px" onclick="ST.step=4;R()">Continuar al pago</button>';
   }
@@ -6618,6 +6618,17 @@ function getPackQty(pid){ return (ST.sel.packs && parseInt(ST.sel.packs[pid])) |
 function hayPackElegido(){
   if(ST.sel.pack) return true;
   if(ST.sel.packs){ for(var k in ST.sel.packs){ if(parseInt(ST.sel.packs[k])>0) return true; } }
+  return false;
+}
+// ¿Hay al menos un extra (retrato) elegido?
+function hayExtraElegido(){
+  if(ST.sel.extras){ for(var k in ST.sel.extras){ if(parseInt(ST.sel.extras[k])>0) return true; } }
+  return false;
+}
+// ¿Hay algo para comprar? (una carpeta, o un retrato extra teniendo derecho)
+function hayAlgoParaComprar(){
+  if(hayPackElegido()) return true;
+  if(hayExtraElegido() && hayCarpetaFisica()) return true; // retrato extra solo, con derecho
   return false;
 }
 // ¿Hay al menos una CARPETA FÍSICA (no digital) elegida? El retrato extra solo se habilita con esto.
