@@ -164,7 +164,7 @@ tr:nth-child(even) td{background:rgba(30,41,59,.35)}
 <div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box"><div class="modal-title" id="modal-title"></div><input class="modal-inp" id="modal-inp" type="text" id="modal-inp"><div class="modal-btns"><button class="btn btn-I" style="flex:1" id="modal-ok-btn">Aceptar</button><button class="btn btn-S" style="flex:1" onclick="modalClose()">Cancelar</button></div></div></div>
 <script>
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
-  var APP_VERSION="1786251919";
+  var APP_VERSION="1786256255";
 if(localStorage.getItem("psz4_ver")!==APP_VERSION){localStorage.removeItem("psz4_ver");localStorage.setItem("psz4_ver",APP_VERSION);}
 // ═══════════════ PHOTOSTORE STUDIO ZETA ═══════════════
 var ST = {
@@ -6322,6 +6322,7 @@ function subirListasNube(){
     schools: ST.schools,
     products: ST.products,
     eventos: ST.eventos || {promesa:{colegios:[]},diplomas:{colegios:[]}},
+    photoMap: ST.photoMap || {},
     cfg: {
       alias: ST.cfg.alias||'',
       photoPrefix: ST.cfg.photoPrefix||''
@@ -6360,6 +6361,7 @@ function bajarListasNube(callback){
         if(res.listas.schools) ST.schools = res.listas.schools;
         if(res.listas.products) ST.products = res.listas.products;
         if(res.listas.eventos) ST.eventos = res.listas.eventos;
+        if(res.listas.photoMap){ ST.photoMap = Object.assign({}, ST.photoMap, res.listas.photoMap); }
         if(res.listas.cfg){
           if(res.listas.cfg.alias) ST.cfg.alias = res.listas.cfg.alias;
           if(res.listas.cfg.photoPrefix) ST.cfg.photoPrefix = res.listas.cfg.photoPrefix;
